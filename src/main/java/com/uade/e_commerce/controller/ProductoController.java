@@ -13,7 +13,10 @@ import com.uade.e_commerce.dto.ProductoResponseDTO;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.service.ProductoService;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import com.uade.e_commerce.dto.ProductoUpdateDTO;
 
 
 
@@ -58,6 +61,10 @@ public class ProductoController {
     public ProductoResponseDTO saveProducto(@RequestBody ProductoRequestDTO producto) {
         return productoService.saveProducto(producto);
     }
-    
+
+    @PutMapping("/{id}")
+    public ProductoResponseDTO updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO dto) {
+        return productoService.updateProducto(id, dto);
+    }
 
 }
