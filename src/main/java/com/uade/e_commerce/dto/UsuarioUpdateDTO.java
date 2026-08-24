@@ -3,8 +3,7 @@ package com.uade.e_commerce.dto;
 import lombok.Data;
 
 @Data
-public class ProductoUpdateDTO {
+public class UsuarioUpdateDTO {
     private String nombre;
-    private Double precio;
-    private Integer stock;
+    private String apellido;
 }
