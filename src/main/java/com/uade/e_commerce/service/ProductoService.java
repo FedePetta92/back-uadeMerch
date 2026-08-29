@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.e_commerce.dto.ProductoRequestDTO;
 import com.uade.e_commerce.dto.ProductoResponseDTO;
+import com.uade.e_commerce.dto.ProductoUpdateDTO;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.repository.ProductoRepository;
 
@@ -31,6 +32,21 @@ public class ProductoService {
 
     public void deleteProducto(Long id) {
         productoRepository.deleteById(id);
+    }
+
+    public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO dto) {
+        Producto prod = productoRepository.findById(id).orElse(null);
+        prod.setNombre(dto.getNombre());
+        prod.setPrecio(dto.getPrecio());
+        prod.setStock(dto.getStock());
+        Producto updated = productoRepository.save(prod);
+        ProductoResponseDTO response = new ProductoResponseDTO();
+        response.setId(updated.getId());
+        response.setNombre(updated.getNombre());
+        response.setDescripcion(updated.getDescripcion());
+        response.setPrecio(updated.getPrecio());
+        response.setStock(updated.getStock());
+        return response;
     }
 
     public ProductoResponseDTO saveProducto(ProductoRequestDTO producto) {
