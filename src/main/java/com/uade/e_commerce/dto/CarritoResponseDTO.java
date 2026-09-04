@@ -1,5 +1,6 @@
 package com.uade.e_commerce.dto;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import com.uade.e_commerce.model.CarritoItem;
@@ -16,6 +17,6 @@ import lombok.NoArgsConstructor;
 public class CarritoResponseDTO {
     private Long id;
     private Long usuarioId;
-    private Double total;
+    private BigDecimal total;
     private List<CarritoItem> items;
 }

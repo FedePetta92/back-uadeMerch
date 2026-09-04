@@ -1,5 +1,7 @@
 package com.uade.e_commerce.controller;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -50,7 +52,7 @@ public class CarritoController {
     }
 
     @GetMapping("/{usuarioId}/total")
-    public ResponseEntity<Double> obtenerTotal(@PathVariable Long usuarioId) {
+    public ResponseEntity<BigDecimal> obtenerTotal(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(carritoService.obtenerTotal(usuarioId));
     }
 
