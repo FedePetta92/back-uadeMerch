@@ -10,6 +10,7 @@ import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.repository.UsuarioRepository;
+import com.uade.e_commerce.security.CodificadorPassword;
 
 import jakarta.transaction.Transactional;
 
@@ -18,9 +19,11 @@ import jakarta.transaction.Transactional;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
+    private final CodificadorPassword passwordEncoder;
 
-    UsuarioService(UsuarioRepository usuarioRepository) {
+    UsuarioService(UsuarioRepository usuarioRepository, CodificadorPassword passwordEncoder) {
         this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<Usuario> getAllUsuarios() {
@@ -55,5 +58,11 @@ public class UsuarioService {
 
     public void deleteUsuario(Long id) {
         usuarioRepository.deleteById(id);
+    }
+    public void cambiarPassword(Long id, String nuevaPassword) {
+        Usuario usuario = getUsuarioById(id);
+        String passwordEncriptada = passwordEncoder.encode(nuevaPassword);
+        usuario.setPassword(passwordEncriptada);
+        usuarioRepository.save(usuario);
     }
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -30,9 +31,16 @@ public class Producto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 30)
     private String nombre;
+    
+    @Column(length = 100)
     private String descripcion;
+    
+    @Column(nullable = false, precision = 10, scale = 2)
     private Double precio;
+    
+    @Column(nullable = false)
     private Integer stock;
 
     @ManyToMany(fetch = FetchType.LAZY)
