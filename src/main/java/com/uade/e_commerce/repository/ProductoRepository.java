@@ -1,6 +1,7 @@
 package com.uade.e_commerce.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,15 +15,6 @@ import com.uade.e_commerce.model.Producto;
  * ProductoRepository
  */
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
-    //jpa save, findAll, findById, deleteById, etc.. ya vienen implementados por JpaRepository
-
-    // Query Method genera un sql en base al nombre del método
-    //"SELECT p FROM Producto p WHERE p.precio < :precio
-    List<Producto> findByPrecioLessThan(Double precio);
-
-    List<Producto> findByPrecioBetween(Double precioMin, Double precioMax);
-
-    List<Producto> findByNombreContainingIgnoreCase(String nombre);
+    Optional<Producto> findById(Long id);
     
-
 }
