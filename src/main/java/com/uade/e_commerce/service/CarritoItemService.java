@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.e_commerce.dto.CarritoItemResponseDTO;
+import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.CarritoItem;
 import com.uade.e_commerce.repository.CarritoItemRepository;
 
@@ -19,7 +20,7 @@ public class CarritoItemService {
 
     public CarritoItem obtenerPorId(Long itemId) {
         return carritoItemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Ítem no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Ítem no encontrado"));
     }
 
     public CarritoItem actualizarCantidad(Long itemId, Integer nuevaCantidad) {

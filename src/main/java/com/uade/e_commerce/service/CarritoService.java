@@ -3,6 +3,7 @@ package com.uade.e_commerce.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Carrito;
 import com.uade.e_commerce.model.CarritoItem;
 import com.uade.e_commerce.model.Producto;
@@ -22,13 +23,13 @@ public class CarritoService {
 
     public Carrito obtenerCarritoPorUsuario(Long usuarioId) {
         return carritoRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("Carrito no encontrado para el usuario " + usuarioId));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Carrito no encontrado para el usuario " + usuarioId));
     }
 
     public Carrito agregarProducto(Long usuarioId, Long productoId, Integer cantidad) {
         Carrito carrito = obtenerCarritoPorUsuario(usuarioId);
         Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
+                .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
         CarritoItem item = new CarritoItem();
         item.setCarrito(carrito);
