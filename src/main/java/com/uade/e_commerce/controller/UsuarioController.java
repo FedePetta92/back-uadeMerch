@@ -7,7 +7,7 @@ import com.uade.e_commerce.service.ProductoService;
 import lombok.Data;
 import org.springframework.web.bind.annotation.*;
 
-import com.uade.e_commerce.dto.RegisterRequest;
+import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.service.UsuarioService;
@@ -35,7 +35,7 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public UsuarioResponseDTO saveUsuario(@RequestBody RegisterRequest request) {
+    public UsuarioResponseDTO saveUsuario(@RequestBody RegisterUsuarioRequest request) {
         return usuarioService.saveUsuario(request);
     }
 

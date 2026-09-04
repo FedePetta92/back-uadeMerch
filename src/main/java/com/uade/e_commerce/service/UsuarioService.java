@@ -3,10 +3,8 @@ package com.uade.e_commerce.service;
 import java.util.List;
 
 import com.uade.e_commerce.dto.UsuarioUpdateDTO;
-import com.uade.e_commerce.repository.ProductoRepository;
 import org.springframework.stereotype.Service;
-
-import com.uade.e_commerce.dto.RegisterRequest;
+import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.repository.UsuarioRepository;
@@ -31,7 +29,7 @@ public class UsuarioService {
         return usuarioRepository.findById(id).orElse(null);
     }
 
-    public UsuarioResponseDTO saveUsuario(RegisterRequest request) {
+    public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
         Usuario usuario = new Usuario(null, request.getNombre(), request.getApellido(), request.getEmail(), request.getPassword());
         Usuario saved = usuarioRepository.save(usuario);
         UsuarioResponseDTO response = new UsuarioResponseDTO();
