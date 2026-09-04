@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.uade.e_commerce.dto.UsuarioUpdateDTO;
 import com.uade.e_commerce.service.ProductoService;
-import lombok.Data;
+//import lombok.Data;
 import org.springframework.web.bind.annotation.*;
 
 import com.uade.e_commerce.dto.RegisterUsuarioRequest;

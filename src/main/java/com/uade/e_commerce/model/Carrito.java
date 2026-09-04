@@ -36,6 +36,7 @@ public class Carrito {
     @Column
     private Double total;
 
+    @Builder.Default
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
 
