@@ -1,45 +1,8 @@
-Contributing · MD
-Guía de contribución - UadeMerchAPI
-Este documento define cómo trabajamos en equipo sobre este repositorio. El objetivo es evitar pisarnos el código y mantener main siempre estable.
+# UadeMerchAPI
 
-Ramas
-main: rama estable. Solo contiene código funcionando. Nunca se pushea directo acá.
-desarrollo: rama de integración. Acá se juntan las features antes de pasar a main.
-feature/nombre-tarea: una rama por tarea/funcionalidad. Ejemplos:
-feature/endpoint-productos
-feature/login-usuario
-feature/conexion-db
-Flujo de trabajo
-Antes de empezar a trabajar, actualizá tu rama desarrollo local:
-bash
-   git checkout desarrollo
-   git pull origin desarrollo
-Creá tu rama de trabajo desde desarrollo:
-bash
-   git checkout -b feature/nombre_tarea
-Trabajá y hacé commits chicos y descriptivos:
-bash
-   git add .
-   git commit -m "Agrega endpoint GET /productos"
-Subí tu rama:
-bash
-   git push -u origin feature/nombre_tarea
-Andá a GitHub y abrí un Pull Request hacia desarrollo.
-Esperá que al menos un compañero revise y apruebe el PR antes de mergear.
-Una vez que desarrollo está estable y probado, se abre un PR de desarrollo hacia main.
-Reglas generales
-❌ Nunca hacer push --force sobre main o desarrollo.
-❌ Nunca commitear archivos de configuración con contraseñas, tokens o credenciales.
-✅ Hacer git pull antes de empezar a trabajar cada vez, para evitar conflictos.
-✅ Commits con mensajes claros (qué se hizo, no "cambios" o "fix").
-✅ Un Pull Request por tarea, lo más chico y enfocado posible.
-✅ Revisar el PR de un compañero antes de aprobarlo (leer el código, no solo aprobar por aprobar).
-Convención de commits (sugerida)
-tipo: descripción corta
+Backend REST desarrollado en Spring Boot para la gestión del e-commerce de merchandising de la UADE. Permite administrar, autenticar y validar usuarios, productos, categorías y carritos de compra, incluyendo operaciones de alta, baja, modificación y consulta sobre cada uno de ellos.
 
-Ejemplos:
-feature: agrega endpoint de creación de productos
-fix: corrige validación de stock negativo
+El sistema persiste los datos en una base MySQL mediante JPA/Hibernate, y expone sus funcionalidades a través de endpoints HTTP consumibles desde clientes externos como por ejemplo Postman o Swagger.
 
-
-Si tenés un conflicto de merge o rompiste algo sin querer, avisá al grupo antes de intentar "arreglarlo" con --force o borrando ramas. La mayoría de los problemas de Git se resuelven fácil si se charlan a tiempo.
+El alcance actual cubre la lógica de negocio principal (catálogo de productos y carritos por usuario).
+Cabe destacar que la autenticación, roles y medios de pago quedan fuera del alcance de esta primera entrega.
