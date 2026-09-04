@@ -3,6 +3,7 @@ package com.uade.e_commerce.model;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,7 +39,7 @@ public class Producto {
     private String descripcion;
     
     @Column(nullable = false, precision = 10, scale = 2)
-    private Double precio;
+    private BigDecimal precio;
     
     @Column(nullable = false)
     private Integer stock;
