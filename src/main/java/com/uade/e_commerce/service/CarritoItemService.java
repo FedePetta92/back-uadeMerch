@@ -1,5 +1,7 @@
 package com.uade.e_commerce.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,8 @@ public class CarritoItemService {
     @Autowired
     private CarritoItemRepository carritoItemRepository;
 
-    public Double calcularSubtotal(CarritoItem item) {
-        return item.getProducto().getPrecio() * item.getCantidad();
+    public BigDecimal calcularSubtotal(CarritoItem item) {
+        return item.getProducto().getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));
     }
 
     public CarritoItem obtenerPorId(Long itemId) {

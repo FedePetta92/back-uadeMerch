@@ -1,5 +1,7 @@
 package com.uade.e_commerce.service;
 
+import java.math.BigDecimal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,13 +48,13 @@ public class CarritoService {
         return carritoRepository.save(carrito);
     }
 
-    public Double calcularTotal(Carrito carrito) {
+    public BigDecimal calcularTotal(Carrito carrito) {
     return carrito.getItems().stream()
-            .mapToDouble(carritoItemService::calcularSubtotal)
-            .sum();
+            .map(carritoItemService::calcularSubtotal)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public Double obtenerTotal(Long usuarioId) {
+    public BigDecimal obtenerTotal(Long usuarioId) {
         Carrito carrito = obtenerCarritoPorUsuario(usuarioId);
         return calcularTotal(carrito);
     }
