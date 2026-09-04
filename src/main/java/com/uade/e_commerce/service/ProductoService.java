@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import com.uade.e_commerce.dto.ProductoRequestDTO;
 import com.uade.e_commerce.dto.ProductoResponseDTO;
 import com.uade.e_commerce.dto.ProductoUpdateDTO;
+import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.repository.ProductoRepository;
 
@@ -27,7 +28,7 @@ public class ProductoService {
     }
 
     public Producto getProductoById(Long id) {
-        return productoRepository.findById(id).orElse(null);
+        return productoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
     }
 
     public void deleteProducto(Long id) {
@@ -35,7 +36,7 @@ public class ProductoService {
     }
 
     public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO dto) {
-        Producto prod = productoRepository.findById(id).orElse(null);
+        Producto prod = productoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
         prod.setNombre(dto.getNombre());
         prod.setPrecio(dto.getPrecio());
         prod.setStock(dto.getStock());

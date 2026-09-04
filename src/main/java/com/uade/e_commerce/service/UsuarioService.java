@@ -3,6 +3,8 @@ package com.uade.e_commerce.service;
 import java.util.List;
 
 import com.uade.e_commerce.dto.UsuarioUpdateDTO;
+import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
+
 import org.springframework.stereotype.Service;
 import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
@@ -26,7 +28,7 @@ public class UsuarioService {
     }
 
     public Usuario getUsuarioById(Long id) {
-        return usuarioRepository.findById(id).orElse(null);
+        return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
     }
 
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
@@ -40,7 +42,7 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO updateUsuario(Long id, UsuarioUpdateDTO dto) {
-        Usuario user = usuarioRepository.findById(id).orElse(null);
+        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         user.setNombre(dto.getNombre());
         user.setApellido(dto.getApellido());
         Usuario updated = usuarioRepository.save(user);
