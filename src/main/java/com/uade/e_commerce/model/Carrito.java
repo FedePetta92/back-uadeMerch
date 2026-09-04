@@ -1,10 +1,8 @@
 package com.uade.e_commerce.model;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -21,6 +19,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor
+@AllArgsConstructor 
 
 public class Carrito {
     @Id
@@ -33,6 +32,9 @@ public class Carrito {
 
     @OneToMany(mappedBy = "carrito")
     private List<CarritoItem> items;
+
+    @Column
+    private Double total;
 
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
