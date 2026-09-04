@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data 
 @Builder 
-public class CarritoRequest {
+public class CarritoRequestDTO {
     private Long usuarioId;
     private Double total;
     private Long itemId;
