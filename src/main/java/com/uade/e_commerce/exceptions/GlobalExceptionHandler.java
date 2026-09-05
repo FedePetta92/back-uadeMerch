@@ -22,4 +22,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGenerico(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+    @ExceptionHandler(PrecioNegativoException.class)
+    public ResponseEntity<String> manejarPrecioNegativo(PrecioNegativoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
