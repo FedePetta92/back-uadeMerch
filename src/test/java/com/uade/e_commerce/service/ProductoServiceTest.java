@@ -32,7 +32,7 @@ public class ProductoServiceTest {
 
     @Test
     void getProductoById_existente_devuelveElProducto() {
-        Producto producto = new Producto(1L, "Remera", "desc", BigDecimal.TEN, 5, null);
+        Producto producto = Producto.builder().id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
 
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
         assertThat(productoService.getProductoById(1L)).isEqualTo(producto);
@@ -49,8 +49,8 @@ public class ProductoServiceTest {
 
     @Test
     void getAllProductos_conProductos_devuelveLaLista() {
-        Producto producto1 = new Producto(1L, "Remera", "desc", BigDecimal.TEN, 5, null);
-        Producto producto2 = new Producto(2L, "Buzo", "desc", BigDecimal.valueOf(20), 3, null);
+        Producto producto1 = Producto.builder().id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
+        Producto producto2 = Producto.builder().id(2L).nombre("Buzo").descripcion("desc").precio(BigDecimal.valueOf(20)).stock(3).build();
         List<Producto> productos = List.of(producto1, producto2);
 
         when(productoRepository.findAll()).thenReturn(productos);
