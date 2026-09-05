@@ -38,7 +38,12 @@ public class UsuarioService {
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
         String passwordEncriptada =
                 passwordEncoder.encode(request.getPassword());
-        Usuario usuario = new Usuario(null, request.getNombre(), request.getApellido(), request.getEmail(), passwordEncriptada);
+        Usuario usuario = Usuario.builder()
+                .nombre(request.getNombre())
+                .apellido(request.getApellido())
+                .email(request.getEmail())
+                .password(passwordEncriptada)
+                .build();
         Usuario saved = usuarioRepository.save(usuario);
         UsuarioResponseDTO response = new UsuarioResponseDTO();
         response.setId(saved.getId());
