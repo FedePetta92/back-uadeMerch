@@ -43,12 +43,16 @@ public class UsuarioService {
                 .apellido(request.getApellido())
                 .email(request.getEmail())
                 .password(passwordEncriptada)
+                .fechaNacimiento(request.getFechaNacimiento())
+                .sexo(request.getSexo())
                 .build();
         Usuario saved = usuarioRepository.save(usuario);
         UsuarioResponseDTO response = new UsuarioResponseDTO();
         response.setId(saved.getId());
         response.setNombre(saved.getNombre());
         response.setApellido(saved.getApellido());
+        response.setFechaNacimiento(saved.getFechaNacimiento());
+        response.setSexo(saved.getSexo());
         return response;
     }
 
