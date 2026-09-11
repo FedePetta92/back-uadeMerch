@@ -1,6 +1,7 @@
 package com.uade.e_commerce.service;
 
 import com.uade.e_commerce.model.Usuario;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -28,6 +29,33 @@ public class JwtService {
                 )
                 .signWith(getKey())
                 .compact();
+    }
+
+
+    public String extractEmail(String token) {
+
+        Claims claims = extractAllClaims(token);
+        return claims.get("email", String.class);
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.getExpiration()
+                    .after(new Date());
+        } catch (Exception e) {
+
+            return false;
+        }
+    }
+
+    private Claims extractAllClaims(String token) {
+
+        return Jwts.parser()
+                .verifyWith(getKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
     private SecretKey getKey() {
