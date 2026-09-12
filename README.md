@@ -6,3 +6,13 @@ El sistema persiste los datos en una base MySQL mediante JPA/Hibernate, y expone
 
 El alcance actual cubre la lógica de negocio principal (catálogo de productos y carritos por usuario).
 Cabe destacar que la autenticación, roles y medios de pago quedan fuera del alcance de esta primera entrega.
+
+
+## Módulos implementados
+
+- **Usuarios**: alta, baja, modificación y consulta de usuarios (`/api/usuarios`), con encriptación de contraseña.
+- **Productos**: CRUD completo de productos (`/api/productos`), incluyendo relación muchos-a-muchos con categorías.
+- **Categorías**: modelo de categorías asociado a productos para clasificar el catálogo.
+- **Carrito de compras**: carrito por usuario (`/api/carritos`) con agregado y eliminación de ítems, y cálculo de total.
+- **Manejo de excepciones**: control centralizado de errores (`GlobalExceptionHandler`) para recursos no encontrados, cantidades inválidas y stock insuficiente, devolviendo códigos HTTP apropiados.
+- **Persistencia**: base de datos MySQL gestionada con Spring Data JPA / Hibernate.
