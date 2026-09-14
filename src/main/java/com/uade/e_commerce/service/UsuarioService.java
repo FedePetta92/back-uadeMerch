@@ -10,6 +10,7 @@ import com.uade.e_commerce.dto.LoginResponseDTO;
 import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.e_commerce.dto.UsuarioUpdateDTO;
+import com.uade.e_commerce.exceptions.EmailDuplicadoException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.exceptions.UnauthorizedException;
 import com.uade.e_commerce.model.Usuario;
@@ -42,6 +43,10 @@ public class UsuarioService {
     }
 
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
+        if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new EmailDuplicadoException("Ya existe un usuario registrado con ese email");
+        }
+
         String passwordEncriptada =
                 passwordEncoder.encode(request.getPassword());
         Usuario usuario = Usuario.builder()
