@@ -30,4 +30,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleUnauthorized(UnauthorizedException ex) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
     }
+    @ExceptionHandler(EmailDuplicadoException.class)
+    public ResponseEntity<String> handleEmailDuplicado(EmailDuplicadoException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
 }
