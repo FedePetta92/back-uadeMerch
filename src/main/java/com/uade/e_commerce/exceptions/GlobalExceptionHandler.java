@@ -22,4 +22,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleGenerico(RuntimeException ex) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ex.getMessage());
     }
+    @ExceptionHandler(PrecioNegativoException.class)
+    public ResponseEntity<String> manejarPrecioNegativo(PrecioNegativoException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<String> handleUnauthorized(UnauthorizedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    }
 }

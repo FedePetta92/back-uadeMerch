@@ -12,6 +12,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,4 +38,10 @@ public class Usuario {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+    @Column(nullable = false)
+    private LocalDate fechaNacimiento;
+
+    @Column(nullable = false)
+    private UsuarioSexo sexo;
 }

@@ -1,11 +1,15 @@
 package com.uade.e_commerce.service;
 
+import java.math.RoundingMode;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.e_commerce.dto.ProductoRequestDTO;
 import com.uade.e_commerce.dto.ProductoResponseDTO;
 import com.uade.e_commerce.dto.ProductoUpdateDTO;
+import com.uade.e_commerce.exceptions.PrecioNegativoException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.repository.ProductoRepository;
@@ -17,11 +21,10 @@ import jakarta.transaction.Transactional;
 public class ProductoService {
 
     
-    private final ProductoRepository productoRepository;
+    @Autowired
+    private ProductoRepository productoRepository;
 
-    ProductoService(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
-    }
+      
 
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
@@ -36,6 +39,12 @@ public class ProductoService {
     }
 
     public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO dto) {
+        Integer precioCasteado = dto.getPrecio().setScale(0,RoundingMode.HALF_UP).intValue();
+
+        if (precioCasteado < 0) {
+            throw new PrecioNegativoException();
+        }
+
         Producto prod = productoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
         prod.setNombre(dto.getNombre());
         prod.setPrecio(dto.getPrecio());
@@ -51,6 +60,12 @@ public class ProductoService {
     }
 
     public ProductoResponseDTO saveProducto(ProductoRequestDTO producto) {
+        Integer precioCasteado = producto.getPrecio().setScale(0,RoundingMode.HALF_UP).intValue();
+
+        if (precioCasteado < 0) {
+            throw new PrecioNegativoException();
+        }
+
         Producto prod = productoRepository.save(new Producto(null, producto.getNombre(), producto.getDescripcion(), producto.getPrecio(), producto.getStock(), null));    
         ProductoResponseDTO prodDTO = new ProductoResponseDTO();
         prodDTO.setId(prod.getId());
@@ -58,10 +73,10 @@ public class ProductoService {
         prodDTO.setDescripcion(prod.getDescripcion());
         prodDTO.setPrecio(prod.getPrecio());
         prodDTO.setStock(prod.getStock());
-        
+
         return prodDTO;
 
     }
-     
-    
+
+
 }

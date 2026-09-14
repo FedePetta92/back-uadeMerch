@@ -1,16 +1,22 @@
 package com.uade.e_commerce.service;
 
-import com.uade.e_commerce.dto.*;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.uade.e_commerce.dto.LoginRequest;
+import com.uade.e_commerce.dto.LoginResponseDTO;
+import com.uade.e_commerce.dto.RegisterUsuarioRequest;
+import com.uade.e_commerce.dto.UsuarioResponseDTO;
+import com.uade.e_commerce.dto.UsuarioUpdateDTO;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.exceptions.UnauthorizedException;
 import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.repository.UsuarioRepository;
 import com.uade.e_commerce.security.CodificadorPassword;
-import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
@@ -43,12 +49,16 @@ public class UsuarioService {
                 .apellido(request.getApellido())
                 .email(request.getEmail())
                 .password(passwordEncriptada)
+                .fechaNacimiento(request.getFechaNacimiento())
+                .sexo(request.getSexo())
                 .build();
         Usuario saved = usuarioRepository.save(usuario);
         UsuarioResponseDTO response = new UsuarioResponseDTO();
         response.setId(saved.getId());
         response.setNombre(saved.getNombre());
         response.setApellido(saved.getApellido());
+        response.setFechaNacimiento(saved.getFechaNacimiento());
+        response.setSexo(saved.getSexo());
         return response;
     }
 
@@ -90,7 +100,7 @@ public class UsuarioService {
         );
 
         if (!passwordValida) {
-            throw new RuntimeException("Contraseña incorrecta");
+            throw new UnauthorizedException("Contraseña incorrecta");
         }
 
 
