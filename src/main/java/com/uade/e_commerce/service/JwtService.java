@@ -12,6 +12,7 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 
 @Service
+/** Servicio que genera y valida tokens JWT para la autenticacion. */
 public class JwtService {
 
     @Value("${jwt.secret}")

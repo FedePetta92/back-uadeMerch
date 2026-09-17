@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder 
 @NoArgsConstructor 
 @AllArgsConstructor 
+
+/** DTO de entrada para crear un producto y validar sus datos. */
 public class ProductoRequestDTO {
     private Long id;
     private String nombre;

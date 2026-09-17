@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/login")
+/**Expone los endpoints de autenticacion y registro de usuarios. */
 public class LoginController {
 
     @Autowired
     UsuarioService usuarioService;
 
+    /** Procesa la operacion solicitada mediante el endpoint REST. */
 
     @PostMapping
     public ResponseEntity<LoginResponseDTO> login(@RequestBody LoginRequest loginRequest) {
@@ -24,8 +26,5 @@ public class LoginController {
         );
 
     }
-
-
-
 
 }

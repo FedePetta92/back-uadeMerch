@@ -11,6 +11,8 @@ import com.uade.e_commerce.model.CarritoItem;
 import com.uade.e_commerce.repository.CarritoItemRepository;
 
 @Service
+
+/** Servicio que coordina validaciones y persistencia de items del carrito. */
 public class CarritoItemService {
 
     @Autowired

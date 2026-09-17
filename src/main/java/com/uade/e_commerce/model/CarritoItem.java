@@ -19,6 +19,8 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+
+/** Entidad JPA que vincula un carrito con un producto y su cantidad. */
 public class CarritoItem {
 
     @Id

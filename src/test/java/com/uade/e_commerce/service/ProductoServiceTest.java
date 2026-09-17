@@ -19,6 +19,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+
+/** Pruebas unitarias del flujo de alta y validacion de productos. */
 public class ProductoServiceTest {
 
     @Mock
@@ -30,6 +32,8 @@ public class ProductoServiceTest {
 
     //nombre de los test -> metodo_escenario_resultadoEsperado
 
+    // Verifica el comportamiento esperado del componente getProductoById que si exista y lo devuelva.
+
     @Test
     void getProductoById_existente_devuelveElProducto() {
         Producto producto = Producto.builder().id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
@@ -37,6 +41,8 @@ public class ProductoServiceTest {
         when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
         assertThat(productoService.getProductoById(1L)).isEqualTo(producto);
     }
+
+    // Verifica el comportamiento esperado del componente getProducto que no exista.
 
     @Test
     void getProductoById_noExistente_lanzaExcepcion() {
@@ -46,6 +52,8 @@ public class ProductoServiceTest {
                 .isInstanceOf(RecursoNoEncontradoException.class)
                 .hasMessage("Producto no encontrado");
     }
+
+    // Verifica el comportamiento esperado del componente getAllProductos y que devuelva lista con productos.
 
     @Test
     void getAllProductos_conProductos_devuelveLaLista() {
@@ -57,6 +65,8 @@ public class ProductoServiceTest {
         assertThat(productoService.getAllProductos()).isEqualTo(productos);
     }
 
+    // Verifica el comportamiento esperado del componente getAllProductos y que devuelva lista vacia.
+
     @Test
     void getAllProductos_sinProductos_devuelveListaVacia() {
        List<Producto> productos = List.of();
@@ -64,6 +74,8 @@ public class ProductoServiceTest {
        when(productoRepository.findAll()).thenReturn(productos);
        assertThat(productoService.getAllProductos()).isEmpty();
     }
+
+    // Verifica el comportamiento esperado del componente deleteProducto.
 
     @Test
     void deleteProducto_idValido_llamaRepositoryDeleteById() {

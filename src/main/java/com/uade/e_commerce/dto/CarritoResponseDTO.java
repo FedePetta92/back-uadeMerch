@@ -13,7 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @NoArgsConstructor 
-@AllArgsConstructor 
+@AllArgsConstructor
+ 
+/** DTO de salida que representa el carrito y sus items. */
 public class CarritoResponseDTO {
     private Long id;
     private Long usuarioId;

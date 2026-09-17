@@ -5,6 +5,8 @@ import lombok.Data;
 
 @Data 
 @Builder 
+
+/** DTO de entrada usado para crear o modificar un carrito. */
 public class CarritoRequestDTO {
     private Long usuarioId;
     private Double total;

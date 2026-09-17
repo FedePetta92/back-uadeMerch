@@ -1,11 +1,14 @@
 package com.uade.e_commerce.dto;
 
-import com.uade.e_commerce.model.UsuarioSexo;
-import lombok.Data;
-
 import java.time.LocalDate;
 
+import com.uade.e_commerce.model.UsuarioSexo;
+
+import lombok.Data;
+
 @Data
+
+/** DTO de salida con los datos visibles de un usuario. */
 public class UsuarioResponseDTO {
     private Long id;
     private String nombre;

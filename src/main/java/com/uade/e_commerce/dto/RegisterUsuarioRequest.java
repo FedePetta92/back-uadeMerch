@@ -13,8 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-//TODO: ssanchez - se podría cambiar el nobmre a UsuarioRegisterDTO
-// TODO: ssanchez - es buena práctica crear un DTO para request, y otro DTO para response, 2 dto por entidad
+
+/** DTO de entrada para registrar un usuario nuevo. */
 public class RegisterUsuarioRequest {
     private String nombre;
     private String apellido;

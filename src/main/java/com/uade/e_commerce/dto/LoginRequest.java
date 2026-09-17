@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
+/** DTO con las credenciales recibidas durante el inicio de sesion. */
 public class LoginRequest {
     private String email;
     private String password;

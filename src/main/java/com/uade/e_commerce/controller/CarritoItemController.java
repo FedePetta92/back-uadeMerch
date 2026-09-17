@@ -21,16 +21,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/carrito-items")
+/** Expone los endpoints REST para agregar, actualizar y quitar productos de un carrito. */
 public class CarritoItemController {
 
     @Autowired
     private CarritoItemService carritoItemService;
+
+    /** Consulta datos mediante el endpoint REST. */
 
     @GetMapping("/{itemId}")
     public ResponseEntity<CarritoItemResponseDTO> obtenerItem(@PathVariable Long itemId) {
         CarritoItem item = carritoItemService.obtenerPorId(itemId);
         return ResponseEntity.ok(carritoItemService.convertirADTO(item));
     }
+
+    /** Procesa la operacion solicitada mediante el endpoint REST. */
 
     @PostMapping("/{itemId}")
     public ResponseEntity<CarritoItemResponseDTO> actualizarCantidad(
@@ -39,6 +44,8 @@ public class CarritoItemController {
         CarritoItem item = carritoItemService.actualizarCantidad(itemId, request.getCantidad());
         return ResponseEntity.ok(carritoItemService.convertirADTO(item));
     }
+
+    /** Elimina datos mediante el endpoint REST. */
 
     @DeleteMapping("/{itemId}")
     public ResponseEntity<Void> eliminarItem(@PathVariable Long itemId) {

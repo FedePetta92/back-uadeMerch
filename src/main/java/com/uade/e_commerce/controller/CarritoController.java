@@ -23,16 +23,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/carritos")
+/** Expone los endpoints REST para consultar y administrar carritos de compra. */
 public class CarritoController {
 
     @Autowired
     private CarritoService carritoService;
+
+    /** Consulta datos mediante el endpoint REST. */
 
     @GetMapping("/{usuarioId}")
     public ResponseEntity<CarritoResponseDTO> obtenerCarrito(@PathVariable Long usuarioId) {
         Carrito carrito = carritoService.obtenerCarritoPorUsuario(usuarioId);
         return ResponseEntity.ok(convertirADTO(carrito));
     }
+
+    /** Procesa la operacion solicitada mediante el endpoint REST. */
 
     @PostMapping("/{usuarioId}/items")
     public ResponseEntity<CarritoResponseDTO> agregarProducto(
@@ -43,6 +48,8 @@ public class CarritoController {
         return ResponseEntity.ok(convertirADTO(carrito));
     }
 
+    /** Elimina datos mediante el endpoint REST. */
+
     @DeleteMapping("/{usuarioId}/items/{itemId}")
     public ResponseEntity<CarritoResponseDTO> eliminarProducto(
             @PathVariable Long usuarioId,
@@ -50,6 +57,8 @@ public class CarritoController {
         Carrito carrito = carritoService.eliminarProducto(usuarioId, itemId);
         return ResponseEntity.ok(convertirADTO(carrito));
     }
+
+    /** Consulta datos mediante el endpoint REST. */
 
     @GetMapping("/{usuarioId}/total")
     public ResponseEntity<BigDecimal> obtenerTotal(@PathVariable Long usuarioId) {

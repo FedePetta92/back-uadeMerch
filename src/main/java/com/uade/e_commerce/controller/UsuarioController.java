@@ -14,6 +14,7 @@ import com.uade.e_commerce.service.UsuarioService;
 
 @RestController
 @RequestMapping("/api/usuarios")
+/** Expone los endpoints REST para consultar y actualizar usuarios autenticados. */
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -24,25 +25,35 @@ public class UsuarioController {
         this.productoService = productoService;
     }
 
+    /** Consulta datos mediante el endpoint REST. */
+
     @GetMapping
     public List<Usuario> getAllUsuarios() {
         return usuarioService.getAllUsuarios();
     }
+
+    /** Consulta datos mediante el endpoint REST. */
 
     @GetMapping("/{id}")
     public Usuario getUsuarioById(@PathVariable Long id) {
         return usuarioService.getUsuarioById(id);
     }
 
+    /** Procesa la operacion solicitada mediante el endpoint REST. */
+
     @PostMapping
     public UsuarioResponseDTO saveUsuario(@RequestBody RegisterUsuarioRequest request) {
         return usuarioService.saveUsuario(request);
     }
 
+    /** Actualiza datos mediante el endpoint REST. */
+
     @PutMapping("/{id}")
     public UsuarioResponseDTO updateUsuario(@PathVariable Long id, @RequestBody UsuarioUpdateDTO dto) {
         return usuarioService.updateUsuario(id, dto);
     }
+
+    /** Elimina datos mediante el endpoint REST. */
 
     @DeleteMapping("/{id}")
     public void deleteUsuario(@PathVariable Long id) {

@@ -21,6 +21,8 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
+
+/** Servicio que gestiona usuarios, credenciales, roles y actualizaciones. */
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;

@@ -13,6 +13,8 @@ import com.uade.e_commerce.repository.CarritoRepository;
 import com.uade.e_commerce.repository.ProductoRepository;
 
 @Service 
+
+/** Servicio que coordina el ciclo de vida del carrito y sus relaciones. */
 public class CarritoService {
     @Autowired
     private CarritoRepository carritoRepository;

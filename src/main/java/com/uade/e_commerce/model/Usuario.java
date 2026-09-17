@@ -1,18 +1,18 @@
 package com.uade.e_commerce.model;
 
-import jakarta.validation.constraints.Email;
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -20,6 +20,7 @@ import java.time.LocalDate;
 @Builder
 @Entity
 @Table(name = "usuarios")
+/** Entidad JPA de usuario, con credenciales, roles y relacion con su carrito. */
 public class Usuario {
 
     @Id

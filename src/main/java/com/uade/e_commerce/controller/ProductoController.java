@@ -20,47 +20,45 @@ import com.uade.e_commerce.dto.ProductoUpdateDTO;
 
 
 
-/**
- * Encargado de recibir request http desde los clientes
- * y devolver respuestas http con los datos solicitados
- * ProductoController
- */
+/** Encargado de recibir request http desde los clientes y devolver respuestas http con los datos solicitados ProductoController */
 @RestController
 @RequestMapping("/api/productos")
+/** Expone los endpoints REST para las operaciones sobre productos. */
 public class ProductoController {
  
-    
     private final ProductoService productoService;
 
     ProductoController(ProductoService productoService) {
         this.productoService = productoService;
     }
 
-    //get http://localhost:8080/api/productos -> listar todos productos
+    //get http://localhost:8080/api/productos -> listar todos productos y consulta datos mediante el endpoint REST. */
     @GetMapping
     public List<Producto> getAllProductos() {
         // Lógica para obtener todos los productos
         return productoService.getAllProductos();
     }
 
-    //get http://localhost:8080/api/productos/1 
+    //get http://localhost:8080/api/productos/1 -> Consulta datos mediante el endpoint REST. */
     @GetMapping("/{id}")
     public Producto getProductoById(@PathVariable Long id) {
         return productoService.getProductoById(id);
     }
 
-    //borra el producto 1 delete http://localhost:8080/api/productos/1 
+    //borra el producto 1 delete http://localhost:8080/api/productos/1 -> Elimina datos mediante el endpoint REST. */
     @DeleteMapping("/{id}")
     public void deleteProducto(@PathVariable Long id) { 
         productoService.deleteProducto(id);
     }
 
     // crear un producto nuevo
-    // post http://localhost:8080/api/productos (enviar body con datos del producto)
+    // post http://localhost:8080/api/productos (enviar body con datos del producto) -> Procesa la operacion solicitada mediante el endpoint REST. */
     @PostMapping()
     public ProductoResponseDTO saveProducto(@RequestBody ProductoRequestDTO producto) {
         return productoService.saveProducto(producto);
     }
+
+    /** Actualiza datos mediante el endpoint REST. */
 
     @PutMapping("/{id}")
     public ProductoResponseDTO updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO dto) {

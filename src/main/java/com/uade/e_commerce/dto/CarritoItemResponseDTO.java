@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+
+/** DTO de salida que representa un item del carrito para la API. */
 public class CarritoItemResponseDTO {
 
     private Long id;

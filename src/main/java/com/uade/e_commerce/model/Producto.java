@@ -28,6 +28,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @Entity
 @Table(name = "productos")
+
+
+/** Entidad JPA que representa un producto vendible y sus datos persistidos. */
 public class Producto {
     
     @Id

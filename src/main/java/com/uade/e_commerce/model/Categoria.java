@@ -14,6 +14,8 @@ import java.util.ArrayList;
 @Builder
 @Entity
 @Table(name = "categorias")
+
+/** Enumera las categorias disponibles para clasificar productos. */
 public class Categoria {
     
     @Id

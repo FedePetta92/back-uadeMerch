@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @Builder 
 @NoArgsConstructor
 @AllArgsConstructor
+
+/** DTO de salida con la informacion publica de un producto. */
 public class ProductoResponseDTO {
     private Long id;
     private String nombre;

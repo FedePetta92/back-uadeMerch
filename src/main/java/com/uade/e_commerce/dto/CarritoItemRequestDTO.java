@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+/** DTO de entrada con los datos necesarios para modificar un Item del carrito. */
 public class CarritoItemRequestDTO {
 
     private Long productoId;

@@ -2,6 +2,7 @@ package com.uade.e_commerce.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,6 +21,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor 
+
+
+/** Entidad JPA que representa el carrito de un usuario y su relacion con los items. */
 
 public class Carrito {
     @Id

@@ -18,6 +18,9 @@ import jakarta.transaction.Transactional;
 
 @Service
 @Transactional
+
+
+/** Servicio que aplica reglas de negocio y coordina la persistencia de productos. */
 public class ProductoService {
 
     @Autowired
