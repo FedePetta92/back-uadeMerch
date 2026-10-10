@@ -39,7 +39,7 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String password;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;
 
     @Column(nullable = false)
