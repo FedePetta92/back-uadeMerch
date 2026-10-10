@@ -20,10 +20,11 @@ import jakarta.transaction.Transactional;
 @Transactional
 public class ProductoService {
 
+    
     @Autowired
     private ProductoRepository productoRepository;
 
-    
+      
 
     public List<Producto> getAllProductos() {
         return productoRepository.findAll();
@@ -32,7 +33,7 @@ public class ProductoService {
     public Producto getProductoById(Long id) {
         return productoRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
     }
-    
+
     public void deleteProducto(Long id) {
         productoRepository.deleteById(id);
     }
@@ -72,10 +73,10 @@ public class ProductoService {
         prodDTO.setDescripcion(prod.getDescripcion());
         prodDTO.setPrecio(prod.getPrecio());
         prodDTO.setStock(prod.getStock());
-        
+
         return prodDTO;
 
     }
-     
-    
+
+
 }

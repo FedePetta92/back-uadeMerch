@@ -1,3 +1,4 @@
+
 package com.uade.e_commerce.config;
 
 import com.uade.e_commerce.security.JwtAuthenticationFilter;
@@ -20,7 +21,13 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+
+                .cors(cors -> {
+                })
+
+
                 .csrf(csrf -> csrf.disable())
+
 
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -32,7 +39,7 @@ public class SecurityConfig {
                         .permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/usuarios")
-                        .permitAll()  
+                        .permitAll()
 
                         .requestMatchers(HttpMethod.GET, "/api/productos/**")
                         .permitAll()
