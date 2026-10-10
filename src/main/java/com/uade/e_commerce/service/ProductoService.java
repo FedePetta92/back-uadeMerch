@@ -66,13 +66,14 @@ public class ProductoService {
             throw new PrecioNegativoException();
         }
 
-        Producto prod = productoRepository.save(new Producto(null, producto.getNombre(), producto.getDescripcion(), producto.getPrecio(), producto.getStock(), null));    
+        Producto prod = productoRepository.save(new Producto(null, producto.getNombre(), producto.getDescripcion(), producto.getPrecio(), producto.getStock(), producto.getImagen(), null));
         ProductoResponseDTO prodDTO = new ProductoResponseDTO();
         prodDTO.setId(prod.getId());
         prodDTO.setNombre(prod.getNombre());
         prodDTO.setDescripcion(prod.getDescripcion());
         prodDTO.setPrecio(prod.getPrecio());
         prodDTO.setStock(prod.getStock());
+        prodDTO.setImagen(prod.getImagen());
 
         return prodDTO;
 

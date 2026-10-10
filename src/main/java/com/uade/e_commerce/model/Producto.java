@@ -46,6 +46,9 @@ public class Producto {
     @Column(nullable = false)
     private Integer stock;
 
+    @Column
+    private String imagen;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
         name = "productos_categorias",
