@@ -62,6 +62,7 @@ public class UsuarioService {
         response.setId(saved.getId());
         response.setNombre(saved.getNombre());
         response.setApellido(saved.getApellido());
+        response.setEmail(saved.getEmail());
         response.setFechaNacimiento(saved.getFechaNacimiento());
         response.setSexo(saved.getSexo());
         return response;
@@ -76,6 +77,7 @@ public class UsuarioService {
         response.setId(updated.getId());
         response.setNombre(updated.getNombre());
         response.setApellido(updated.getApellido());
+        response.setEmail(updated.getEmail());
         return response;
     }
 

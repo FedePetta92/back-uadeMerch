@@ -79,6 +79,7 @@ public class UsuarioServiceTest {
 
         assertThat(response.getNombre()).isEqualTo("Mauro");
         assertThat(response.getApellido()).isEqualTo("Aguilera");
+        assertThat(response.getEmail()).isEqualTo("mauro@test.com");
         assertThat(response.getId()).isEqualTo(1L);
         verify(usuarioRepository).save(any(Usuario.class));
     }
