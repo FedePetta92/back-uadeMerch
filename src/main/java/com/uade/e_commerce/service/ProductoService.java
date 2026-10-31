@@ -31,16 +31,20 @@ public class ProductoService {
 
       
 
+    // Devuelve el catálogo: todos los productos activos (los dados de baja no se muestran).
     public List<Producto> getAllProductos() {
         return productoRepository.findByActivoTrue();
     }
 
+    // Busca un producto activo por id. Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public Producto getProductoById(Long id) {
         return productoRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
     }
 
-    // Borrado lógico: el producto no se elimina porque las órdenes de compra que lo vendieron lo siguen referenciando.
+    // Da de baja un producto con borrado lógico: lo marca como inactivo y guarda la fecha de baja.
+    // No se elimina la fila porque las órdenes de compra que lo vendieron lo siguen referenciando (historial).
     // Se saca del catálogo y de los carritos (que son datos temporales), así ya no se puede comprar.
+    // Si no existe o ya estaba dado de baja, lanza RecursoNoEncontradoException (404).
     public void deleteProducto(Long id) {
         Producto producto = getProductoById(id);
 
@@ -51,6 +55,9 @@ public class ProductoService {
         productoRepository.save(producto);
     }
 
+    // Actualiza nombre, precio y stock de un producto activo y devuelve sus datos.
+    // Lanza PrecioNegativoException si el precio es negativo, y RecursoNoEncontradoException (404)
+    // si el producto no existe o está dado de baja.
     public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO dto) {
         Integer precioCasteado = dto.getPrecio().setScale(0,RoundingMode.HALF_UP).intValue();
 
@@ -72,6 +79,8 @@ public class ProductoService {
         return response;
     }
 
+    // Crea un producto nuevo (queda activo) y devuelve sus datos.
+    // Lanza PrecioNegativoException si el precio es negativo.
     public ProductoResponseDTO saveProducto(ProductoRequestDTO producto) {
         Integer precioCasteado = producto.getPrecio().setScale(0,RoundingMode.HALF_UP).intValue();
 

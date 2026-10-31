@@ -38,14 +38,19 @@ public class UsuarioService {
         this.carritoRepository = carritoRepository;
     }
 
+    // Devuelve todos los usuarios activos (los dados de baja no se listan).
     public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findByActivoTrue();
     }
 
+    // Busca un usuario activo por id. Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public Usuario getUsuarioById(Long id) {
         return usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
     }
 
+    // Registra un usuario nuevo: valida que el email no esté usado, encripta la contraseña y lo guarda activo.
+    // Devuelve sus datos sin la contraseña.
+    // El email se busca también entre los dados de baja, porque en la tabla tiene que ser único.
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailDuplicadoException("Ya existe un usuario registrado con ese email");
@@ -72,6 +77,8 @@ public class UsuarioService {
         return response;
     }
 
+    // Actualiza el nombre y el apellido de un usuario activo y devuelve sus datos.
+    // Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public UsuarioResponseDTO updateUsuario(Long id, UsuarioUpdateDTO dto) {
         Usuario user = usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         user.setNombre(dto.getNombre());
@@ -85,8 +92,10 @@ public class UsuarioService {
         return response;
     }
 
-    // Borrado lógico: el usuario no se elimina porque sus órdenes de compra lo siguen referenciando (historial).
+    // Da de baja a un usuario con borrado lógico: lo marca como inactivo y guarda la fecha de baja.
+    // No se elimina la fila porque sus órdenes de compra lo siguen referenciando (historial).
     // El carrito sí se borra: es un dato temporal, no historial. Al borrarlo, la cascada elimina sus items.
+    // Si no existe o ya estaba dado de baja, lanza RecursoNoEncontradoException (404).
     public void deleteUsuario(Long id) {
         Usuario usuario = usuarioRepository.findByIdAndActivoTrue(id)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
@@ -106,6 +115,9 @@ public class UsuarioService {
     }
 
 
+    // Valida email y contraseña y, si son correctos, devuelve un token JWT y el id del usuario
+    // (el front necesita el id para llamar a los endpoints del carrito).
+    // Si el usuario no existe, está dado de baja o la contraseña es incorrecta, lanza UnauthorizedException.
     public LoginResponseDTO login(LoginRequest request) {
 
         // Un usuario dado de baja no puede iniciar sesión

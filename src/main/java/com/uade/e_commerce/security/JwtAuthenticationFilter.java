@@ -25,6 +25,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final UsuarioRepository usuarioRepository;
 
+    // Se ejecuta en cada request: si trae un token JWT válido de un usuario activo, lo autentica.
+    // Si no trae token, el token es inválido o el usuario está dado de baja, la request sigue sin autenticar
+    // y Spring Security la rechaza en las rutas protegidas.
     @Override
     protected void doFilterInternal(
             HttpServletRequest request,

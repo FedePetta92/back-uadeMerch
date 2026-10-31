@@ -35,6 +35,7 @@ public class CarritoService {
                 .orElseGet(() -> crearCarritoParaUsuario(usuarioId));
     }
 
+    /** Crea un carrito vacío para un usuario activo. Si no existe o está dado de baja, lanza RecursoNoEncontradoException. */
     private Carrito crearCarritoParaUsuario(Long usuarioId) {
         Usuario usuario = usuarioRepository.findByIdAndActivoTrue(usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
@@ -52,6 +53,10 @@ public class CarritoService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Carrito no encontrado para el usuario " + usuarioId));
     }
 
+    /**
+     * Agrega un producto al carrito del usuario (si el usuario no tiene carrito, lo crea).
+     * Solo se pueden agregar productos activos: si no existe o está dado de baja, lanza RecursoNoEncontradoException.
+     */
     public Carrito agregarProducto(Long usuarioId, Long productoId, Integer cantidad) {
         Carrito carrito = obtenerOcrearCarritoPorUsuario(usuarioId);
         // Un producto dado de baja ya no se puede agregar al carrito
