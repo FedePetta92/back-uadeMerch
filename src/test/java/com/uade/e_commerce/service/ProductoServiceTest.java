@@ -2,6 +2,7 @@ package com.uade.e_commerce.service;
 
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Producto;
+import com.uade.e_commerce.repository.CarritoItemRepository;
 import com.uade.e_commerce.repository.ProductoRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,6 +26,9 @@ public class ProductoServiceTest {
 
     @Mock
     private ProductoRepository productoRepository;
+
+    @Mock
+    private CarritoItemRepository carritoItemRepository;
 
     @InjectMocks
     private ProductoService productoService;
@@ -34,13 +40,13 @@ public class ProductoServiceTest {
     void getProductoById_existente_devuelveElProducto() {
         Producto producto = Producto.builder().id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
 
-        when(productoRepository.findById(1L)).thenReturn(Optional.of(producto));
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(producto));
         assertThat(productoService.getProductoById(1L)).isEqualTo(producto);
     }
 
     @Test
     void getProductoById_noExistente_lanzaExcepcion() {
-        when(productoRepository.findById(1L)).thenReturn(Optional.empty());
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> productoService.getProductoById(1L))
                 .isInstanceOf(RecursoNoEncontradoException.class)
@@ -53,7 +59,7 @@ public class ProductoServiceTest {
         Producto producto2 = Producto.builder().id(2L).nombre("Buzo").descripcion("desc").precio(BigDecimal.valueOf(20)).stock(3).build();
         List<Producto> productos = List.of(producto1, producto2);
 
-        when(productoRepository.findAll()).thenReturn(productos);
+        when(productoRepository.findByActivoTrue()).thenReturn(productos);
         assertThat(productoService.getAllProductos()).isEqualTo(productos);
     }
 
@@ -61,14 +67,43 @@ public class ProductoServiceTest {
     void getAllProductos_sinProductos_devuelveListaVacia() {
        List<Producto> productos = List.of();
 
-       when(productoRepository.findAll()).thenReturn(productos);
+       when(productoRepository.findByActivoTrue()).thenReturn(productos);
        assertThat(productoService.getAllProductos()).isEmpty();
     }
 
     @Test
-    void deleteProducto_idValido_llamaRepositoryDeleteById() {
+    void deleteProducto_existente_loQuitaDeLosCarritosYLoDaDeBaja() {
+        Producto producto = Producto.builder().id(1L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
+
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(producto));
+
         productoService.deleteProducto(1L);
 
-        verify(productoRepository).deleteById(1L);
+        verify(carritoItemRepository).deleteByProductoId(1L);
+        assertThat(producto.isActivo()).isFalse();
+        assertThat(producto.getFechaBaja()).isNotNull();
+        verify(productoRepository).save(producto);
+        // Borrado lógico: nunca se elimina la fila
+        verify(productoRepository, never()).deleteById(any());
+        verify(productoRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteProducto_noExistenteODadoDeBaja_lanzaExcepcion() {
+        when(productoRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productoService.deleteProducto(99L))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("Producto no encontrado");
+
+        verify(carritoItemRepository, never()).deleteByProductoId(any());
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void productoNuevo_conBuilder_quedaActivo() {
+        Producto producto = Producto.builder().nombre("Remera").build();
+
+        assertThat(producto.isActivo()).isTrue();
     }
 }

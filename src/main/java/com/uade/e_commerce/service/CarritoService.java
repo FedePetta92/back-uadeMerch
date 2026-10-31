@@ -36,7 +36,7 @@ public class CarritoService {
     }
 
     private Carrito crearCarritoParaUsuario(Long usuarioId) {
-        Usuario usuario = usuarioRepository.findById(usuarioId)
+        Usuario usuario = usuarioRepository.findByIdAndActivoTrue(usuarioId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
 
         Carrito nuevoCarrito = Carrito.builder()
@@ -54,7 +54,8 @@ public class CarritoService {
 
     public Carrito agregarProducto(Long usuarioId, Long productoId, Integer cantidad) {
         Carrito carrito = obtenerOcrearCarritoPorUsuario(usuarioId);
-        Producto producto = productoRepository.findById(productoId)
+        // Un producto dado de baja ya no se puede agregar al carrito
+        Producto producto = productoRepository.findByIdAndActivoTrue(productoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
         CarritoItem item = new CarritoItem();

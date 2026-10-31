@@ -54,8 +54,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().getAuthentication() == null) {
 
 
+                // Si el usuario se dio de baja, su token deja de servir aunque no haya vencido
                 Usuario usuario = usuarioRepository
-                        .findByEmail(email)
+                        .findByEmailAndActivoTrue(email)
                         .orElse(null);
 
 

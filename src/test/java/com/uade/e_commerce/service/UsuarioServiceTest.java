@@ -8,13 +8,16 @@ import com.uade.e_commerce.dto.UsuarioUpdateDTO;
 import com.uade.e_commerce.exceptions.EmailDuplicadoException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.exceptions.UnauthorizedException;
+import com.uade.e_commerce.model.Carrito;
 import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.model.UsuarioSexo;
+import com.uade.e_commerce.repository.CarritoRepository;
 import com.uade.e_commerce.repository.UsuarioRepository;
 import com.uade.e_commerce.security.CodificadorPassword;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -39,6 +42,9 @@ public class UsuarioServiceTest {
 
     @Mock
     private JwtService jwtService;
+
+    @Mock
+    private CarritoRepository carritoRepository;
 
     @InjectMocks
     private UsuarioService usuarioService;
@@ -81,7 +87,11 @@ public class UsuarioServiceTest {
         assertThat(response.getApellido()).isEqualTo("Aguilera");
         assertThat(response.getEmail()).isEqualTo("mauro@test.com");
         assertThat(response.getId()).isEqualTo(1L);
-        verify(usuarioRepository).save(any(Usuario.class));
+
+        // El usuario nuevo se guarda activo
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(usuarioRepository).save(captor.capture());
+        assertThat(captor.getValue().isActivo()).isTrue();
     }
 
     @Test
@@ -117,7 +127,7 @@ public class UsuarioServiceTest {
                 .password("hash-almacenado")
                 .build();
 
-        when(usuarioRepository.findByEmail("mauro@test.com")).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByEmailAndActivoTrue("mauro@test.com")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("1234", "hash-almacenado")).thenReturn(true);
         when(jwtService.generateToken(usuario)).thenReturn("token-falso");
 
@@ -134,7 +144,7 @@ public class UsuarioServiceTest {
                 .password("1234")
                 .build();
 
-        when(usuarioRepository.findByEmail("noexiste@test.com")).thenReturn(Optional.empty());
+        when(usuarioRepository.findByEmailAndActivoTrue("noexiste@test.com")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.login(request))
                 .isInstanceOf(UnauthorizedException.class)
@@ -154,7 +164,7 @@ public class UsuarioServiceTest {
                 .password("hash-almacenado")
                 .build();
 
-        when(usuarioRepository.findByEmail("mauro@test.com")).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.findByEmailAndActivoTrue("mauro@test.com")).thenReturn(Optional.of(usuario));
         when(passwordEncoder.matches("mal", "hash-almacenado")).thenReturn(false);
 
         assertThatThrownBy(() -> usuarioService.login(request))
@@ -182,7 +192,7 @@ public class UsuarioServiceTest {
                 .apellido("NuevoApellido")
                 .build();
 
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuarioExistente));
+        when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuarioExistente));
         when(usuarioRepository.save(usuarioExistente)).thenReturn(usuarioActualizado);
 
         UsuarioResponseDTO response = usuarioService.updateUsuario(1L, dto);
@@ -197,10 +207,71 @@ public class UsuarioServiceTest {
         dto.setNombre("Nombre");
         dto.setApellido("Apellido");
 
-        when(usuarioRepository.findById(99L)).thenReturn(Optional.empty());
+        when(usuarioRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> usuarioService.updateUsuario(99L, dto))
                 .isInstanceOf(RecursoNoEncontradoException.class)
                 .hasMessage("Usuario no encontrado");
+    }
+
+    @Test
+    void login_usuarioDadoDeBaja_lanzaExcepcion() {
+        LoginRequest request = LoginRequest.builder()
+                .email("baja@test.com")
+                .password("1234")
+                .build();
+
+        // findByEmailAndActivoTrue no encuentra a los usuarios dados de baja
+        when(usuarioRepository.findByEmailAndActivoTrue("baja@test.com")).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usuarioService.login(request))
+                .isInstanceOf(UnauthorizedException.class)
+                .hasMessage("Usuario inexistente");
+
+        verify(jwtService, never()).generateToken(any());
+    }
+
+    @Test
+    void deleteUsuario_conCarrito_borraElCarritoYDaDeBajaAlUsuario() {
+        Usuario usuario = Usuario.builder().id(1L).email("mauro@test.com").build();
+        Carrito carrito = Carrito.builder().id(10L).usuario(usuario).build();
+
+        when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuario));
+        when(carritoRepository.findByUsuarioId(1L)).thenReturn(Optional.of(carrito));
+
+        usuarioService.deleteUsuario(1L);
+
+        verify(carritoRepository).delete(carrito);
+        assertThat(usuario.isActivo()).isFalse();
+        assertThat(usuario.getFechaBaja()).isNotNull();
+        verify(usuarioRepository).save(usuario);
+        // Borrado lógico: nunca se elimina la fila
+        verify(usuarioRepository, never()).deleteById(any());
+        verify(usuarioRepository, never()).delete(any());
+    }
+
+    @Test
+    void deleteUsuario_sinCarrito_soloDaDeBajaAlUsuario() {
+        Usuario usuario = Usuario.builder().id(1L).email("mauro@test.com").build();
+
+        when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuario));
+        when(carritoRepository.findByUsuarioId(1L)).thenReturn(Optional.empty());
+
+        usuarioService.deleteUsuario(1L);
+
+        verify(carritoRepository, never()).delete(any());
+        assertThat(usuario.isActivo()).isFalse();
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void deleteUsuario_noExistenteODadoDeBaja_lanzaExcepcion() {
+        when(usuarioRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usuarioService.deleteUsuario(99L))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("Usuario no encontrado");
+
+        verify(usuarioRepository, never()).save(any());
     }
 }
