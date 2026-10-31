@@ -113,6 +113,7 @@ public class UsuarioService {
 
         return LoginResponseDTO.builder()
                 .token(token)
+                .usuarioId(usuario.getId())
                 .build();
     }
 }

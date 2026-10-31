@@ -123,6 +123,7 @@ public class UsuarioServiceTest {
         LoginResponseDTO response = usuarioService.login(request);
 
         assertThat(response.getToken()).isEqualTo("token-falso");
+        assertThat(response.getUsuarioId()).isEqualTo(1L);
     }
 
     @Test
