@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.List;
 
 
 @RestController
@@ -44,5 +45,15 @@ public class CarritoItemController {
     public ResponseEntity<Void> eliminarItem(@PathVariable Long itemId) {
         carritoItemService.eliminarItem(itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<CarritoItemResponseDTO>> obtenerTodos() {
+
+        List<CarritoItem> items = carritoItemService.obtenerTodos();
+        List<CarritoItemResponseDTO> response = items.stream()
+                .map(carritoItemService::convertirADTO)
+                .toList();
+        return ResponseEntity.ok(response);
     }
 }
