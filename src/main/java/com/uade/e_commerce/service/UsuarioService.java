@@ -34,12 +34,14 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
+    public List<UsuarioResponseDTO> getAllUsuarios() {
+        return usuarioRepository.findAll().stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
-    public Usuario getUsuarioById(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
+    public UsuarioResponseDTO getUsuarioById(Long id) {
+        return toResponseDTO(buscarUsuario(id));
     }
 
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
@@ -84,7 +86,7 @@ public class UsuarioService {
     }
 
     public void cambiarPassword(Long id, String nuevaPassword) {
-        Usuario usuario = getUsuarioById(id);
+        Usuario usuario = buscarUsuario(id);
         String passwordEncriptada = passwordEncoder.encode(nuevaPassword);
         usuario.setPassword(passwordEncriptada);
         usuarioRepository.save(usuario);
@@ -115,5 +117,23 @@ public class UsuarioService {
                 .token(token)
                 .usuarioId(usuario.getId())
                 .build();
+    }
+
+    // Uso interno: devuelve la entidad completa (incluye el hash de la contraseña).
+    // Nunca debe salir tal cual por la API.
+    private Usuario buscarUsuario(Long id) {
+        return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
+    }
+
+    // Convierte la entidad en el DTO público: sin password.
+    private UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        dto.setId(usuario.getId());
+        dto.setNombre(usuario.getNombre());
+        dto.setApellido(usuario.getApellido());
+        dto.setEmail(usuario.getEmail());
+        dto.setFechaNacimiento(usuario.getFechaNacimiento());
+        dto.setSexo(usuario.getSexo());
+        return dto;
     }
 }

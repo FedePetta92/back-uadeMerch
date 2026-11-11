@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
-import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.service.UsuarioService;
 
 @RestController
@@ -25,12 +24,12 @@ public class UsuarioController {
     }
 
     @GetMapping
-    public List<Usuario> getAllUsuarios() {
+    public List<UsuarioResponseDTO> getAllUsuarios() {
         return usuarioService.getAllUsuarios();
     }
 
     @GetMapping("/{id}")
-    public Usuario getUsuarioById(@PathVariable Long id) {
+    public UsuarioResponseDTO getUsuarioById(@PathVariable Long id) {
         return usuarioService.getUsuarioById(id);
     }
 
