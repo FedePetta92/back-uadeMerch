@@ -273,6 +273,7 @@ class AutorizacionPorUsuarioTest {
         producto.setDescripcion("Producto de prueba");
         producto.setPrecio(new BigDecimal("1000.00"));
         producto.setStock(10);
+        producto.setActivo(true);
         return productoRepository.save(producto).getId();
     }
 
