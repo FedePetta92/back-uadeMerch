@@ -1,6 +1,8 @@
 package com.uade.e_commerce.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,10 @@ public class CarritoItemService {
         CarritoItem item = obtenerPorId(itemId);
         item.setCantidad(nuevaCantidad);
         return carritoItemRepository.save(item);
+    }
+
+    public List<CarritoItem> obtenerTodos (){
+        return carritoItemRepository.findAll();
     }
 
     public void eliminarItem(Long itemId) {

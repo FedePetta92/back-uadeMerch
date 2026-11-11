@@ -4,6 +4,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 @Data
 @NoArgsConstructor
@@ -57,5 +59,15 @@ public class Producto {
     )
     private List<Categoria> categorias = new ArrayList<>();
 
+    // Borrado lógico: en vez de eliminar la fila se marca como dado de baja,
+    // así no se pierde el historial (las órdenes de compra lo siguen referenciando).
+    // @ColumnDefault hace que las filas que ya existían en la tabla queden activas al agregarse la columna.
+    @Builder.Default
+    @ColumnDefault("true")
+    @Column(nullable = false)
+    private boolean activo = true;
+
+    @Column(name = "fecha_baja")
+    private LocalDateTime fechaBaja;
 
 }

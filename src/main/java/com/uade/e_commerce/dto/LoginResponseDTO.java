@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class LoginResponseDTO {
 
     private String token;
+    // Id del usuario logueado: el front lo necesita para llamar a los endpoints del carrito (/api/carritos/{usuarioId})
     private Long usuarioId;
 
 }

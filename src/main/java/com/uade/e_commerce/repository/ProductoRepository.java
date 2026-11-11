@@ -16,5 +16,8 @@ import com.uade.e_commerce.model.Producto;
  */
 public interface ProductoRepository extends JpaRepository<Producto, Long> {
     Optional<Producto> findById(Long id);
-    
+
+    // Solo productos activos (los dados de baja con borrado lógico quedan afuera del catálogo)
+    List<Producto> findByActivoTrue();
+    Optional<Producto> findByIdAndActivoTrue(Long id);
 }

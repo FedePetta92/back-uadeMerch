@@ -70,6 +70,10 @@ public class OrdenCompraService {
         for (CarritoItem ci : carrito.getItems()) {
             Producto producto = ci.getProducto();
 
+            // Un producto dado de baja no se puede comprar (por si quedó en algún carrito)
+            if (!producto.isActivo()) {
+                throw new OrdenCompraInvalidaException(producto.getNombre() + " ya no está disponible");
+            }
             if (ci.getCantidad() == null || ci.getCantidad() <= 0) {
                 throw new OrdenCompraInvalidaException("Cantidad inválida para " + producto.getNombre());
             }

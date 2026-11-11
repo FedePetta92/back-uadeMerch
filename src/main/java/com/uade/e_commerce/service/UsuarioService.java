@@ -1,5 +1,6 @@
 package com.uade.e_commerce.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import com.uade.e_commerce.exceptions.EmailDuplicadoException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.exceptions.UnauthorizedException;
 import com.uade.e_commerce.model.Usuario;
+import com.uade.e_commerce.repository.CarritoRepository;
 import com.uade.e_commerce.repository.UsuarioRepository;
 import com.uade.e_commerce.security.CodificadorPassword;
 
@@ -25,25 +27,33 @@ public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
     private final CodificadorPassword passwordEncoder;
+    private final CarritoRepository carritoRepository;
 
     @Autowired
     private JwtService jwtService;
 
-    UsuarioService(UsuarioRepository usuarioRepository, CodificadorPassword passwordEncoder) {
+    UsuarioService(UsuarioRepository usuarioRepository, CodificadorPassword passwordEncoder, CarritoRepository carritoRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
+        this.carritoRepository = carritoRepository;
     }
 
+    // Devuelve todos los usuarios activos (los dados de baja no se listan), sin la contraseña.
     public List<UsuarioResponseDTO> getAllUsuarios() {
-        return usuarioRepository.findAll().stream()
+        return usuarioRepository.findByActivoTrue().stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
 
+    // Busca un usuario activo por id y lo devuelve sin la contraseña.
+    // Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public UsuarioResponseDTO getUsuarioById(Long id) {
         return toResponseDTO(buscarUsuario(id));
     }
 
+    // Registra un usuario nuevo: valida que el email no esté usado, encripta la contraseña y lo guarda activo.
+    // Devuelve sus datos sin la contraseña.
+    // El email se busca también entre los dados de baja, porque en la tabla tiene que ser único.
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new EmailDuplicadoException("Ya existe un usuario registrado con ese email");
@@ -64,13 +74,16 @@ public class UsuarioService {
         response.setId(saved.getId());
         response.setNombre(saved.getNombre());
         response.setApellido(saved.getApellido());
+        response.setEmail(saved.getEmail());
         response.setFechaNacimiento(saved.getFechaNacimiento());
         response.setSexo(saved.getSexo());
         return response;
     }
 
+    // Actualiza el nombre y el apellido de un usuario activo y devuelve sus datos.
+    // Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public UsuarioResponseDTO updateUsuario(Long id, UsuarioUpdateDTO dto) {
-        Usuario user = usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+        Usuario user = usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         user.setNombre(dto.getNombre());
         user.setApellido(dto.getApellido());
         Usuario updated = usuarioRepository.save(user);
@@ -78,11 +91,23 @@ public class UsuarioService {
         response.setId(updated.getId());
         response.setNombre(updated.getNombre());
         response.setApellido(updated.getApellido());
+        response.setEmail(updated.getEmail());
         return response;
     }
 
+    // Da de baja a un usuario con borrado lógico: lo marca como inactivo y guarda la fecha de baja.
+    // No se elimina la fila porque sus órdenes de compra lo siguen referenciando (historial).
+    // El carrito sí se borra: es un dato temporal, no historial. Al borrarlo, la cascada elimina sus items.
+    // Si no existe o ya estaba dado de baja, lanza RecursoNoEncontradoException (404).
     public void deleteUsuario(Long id) {
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findByIdAndActivoTrue(id)
+                .orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
+
+        carritoRepository.findByUsuarioId(id).ifPresent(carritoRepository::delete);
+
+        usuario.setActivo(false);
+        usuario.setFechaBaja(LocalDateTime.now());
+        usuarioRepository.save(usuario);
     }
 
     public void cambiarPassword(Long id, String nuevaPassword) {
@@ -93,10 +118,14 @@ public class UsuarioService {
     }
 
 
+    // Valida email y contraseña y, si son correctos, devuelve un token JWT y el id del usuario
+    // (el front necesita el id para llamar a los endpoints del carrito).
+    // Si el usuario no existe, está dado de baja o la contraseña es incorrecta, lanza UnauthorizedException.
     public LoginResponseDTO login(LoginRequest request) {
 
+        // Un usuario dado de baja no puede iniciar sesión
         Usuario usuario = usuarioRepository
-                .findByEmail(request.getEmail())
+                .findByEmailAndActivoTrue(request.getEmail())
                 .orElseThrow(() ->
                         new UnauthorizedException("Usuario inexistente")
                 );
@@ -119,10 +148,10 @@ public class UsuarioService {
                 .build();
     }
 
-    // Uso interno: devuelve la entidad completa (incluye el hash de la contraseña).
+    // Uso interno: devuelve la entidad completa (incluye el hash de la contraseña) de un usuario activo.
     // Nunca debe salir tal cual por la API.
     private Usuario buscarUsuario(Long id) {
-        return usuarioRepository.findById(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
+        return usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
     }
 
     // Convierte la entidad en el DTO público: sin password.
