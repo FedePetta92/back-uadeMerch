@@ -39,4 +39,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleEmailDuplicado(EmailDuplicadoException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<String> handleAccesoDenegado(AccesoDenegadoException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    }
 }

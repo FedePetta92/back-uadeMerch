@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,8 @@ import com.uade.e_commerce.dto.OrdenCompraResponseDTO;
 import com.uade.e_commerce.dto.PagoRequestDTO;
 import com.uade.e_commerce.model.EstadoOrdenCompra;
 import com.uade.e_commerce.model.OrdenCompra;
+import com.uade.e_commerce.model.Usuario;
+import com.uade.e_commerce.security.AccesoUsuario;
 import com.uade.e_commerce.service.OrdenCompraService;
 
 @RestController
@@ -34,8 +37,10 @@ public class OrdenCompraController {
     // Compra todo el carrito del usuario. 201 si el pago se aprueba, 402 si se rechaza.
     @PostMapping("/{usuarioId}/checkout")
     public ResponseEntity<OrdenCompraResponseDTO> checkout(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable Long usuarioId,
             @RequestBody PagoRequestDTO request) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         OrdenCompra orden = ordenService.checkout(usuarioId, request.getNumeroTarjeta());
         HttpStatus status = orden.getEstado() == EstadoOrdenCompra.PAGADA
                 ? HttpStatus.CREATED
@@ -45,7 +50,10 @@ public class OrdenCompraController {
 
     // Historial de ordenes del usuario.
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<OrdenCompraResponseDTO>> listarPorUsuario(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<OrdenCompraResponseDTO>> listarPorUsuario(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
+            @PathVariable Long usuarioId) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         return ResponseEntity.ok(ordenService.listarPorUsuario(usuarioId));
     }
 

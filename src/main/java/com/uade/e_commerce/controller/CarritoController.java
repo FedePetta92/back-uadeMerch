@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.uade.e_commerce.dto.CarritoItemRequestDTO;
 import com.uade.e_commerce.dto.CarritoResponseDTO;
 import com.uade.e_commerce.model.Carrito;
+import com.uade.e_commerce.model.Usuario;
+import com.uade.e_commerce.security.AccesoUsuario;
 import com.uade.e_commerce.service.CarritoItemService;
 import com.uade.e_commerce.service.CarritoService;
 
@@ -34,15 +37,20 @@ public class CarritoController {
     private CarritoItemService carritoItemService;
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<CarritoResponseDTO> obtenerCarrito(@PathVariable Long usuarioId) {
+    public ResponseEntity<CarritoResponseDTO> obtenerCarrito(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
+            @PathVariable Long usuarioId) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         Carrito carrito = carritoService.obtenerCarritoPorUsuario(usuarioId);
         return ResponseEntity.ok(convertirADTO(carrito));
     }
 
     @PostMapping("/{usuarioId}/items")
     public ResponseEntity<CarritoResponseDTO> agregarProducto(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable Long usuarioId,
             @RequestBody CarritoItemRequestDTO request) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         Carrito carrito = carritoService.agregarProducto(
                 usuarioId, request.getProductoId(), request.getCantidad());
         return ResponseEntity.ok(convertirADTO(carrito));
@@ -50,14 +58,19 @@ public class CarritoController {
 
     @DeleteMapping("/{usuarioId}/items/{itemId}")
     public ResponseEntity<CarritoResponseDTO> eliminarProducto(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable Long usuarioId,
             @PathVariable Long itemId) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         Carrito carrito = carritoService.eliminarProducto(usuarioId, itemId);
         return ResponseEntity.ok(convertirADTO(carrito));
     }
 
     @GetMapping("/{usuarioId}/total")
-    public ResponseEntity<BigDecimal> obtenerTotal(@PathVariable Long usuarioId) {
+    public ResponseEntity<BigDecimal> obtenerTotal(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
+            @PathVariable Long usuarioId) {
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
         return ResponseEntity.ok(carritoService.obtenerTotal(usuarioId));
     }
 
