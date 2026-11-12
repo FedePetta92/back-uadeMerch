@@ -1,6 +1,7 @@
 package com.uade.e_commerce.service;
 
 import com.uade.e_commerce.dto.CarritoItemResponseDTO;
+import com.uade.e_commerce.exceptions.CantidadInvalidaException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.CarritoItem;
 import com.uade.e_commerce.model.Producto;
@@ -16,6 +17,8 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +84,29 @@ public class CarritoItemServiceTest {
         assertThatThrownBy(() -> carritoItemService.actualizarCantidad(99L, 3))
                 .isInstanceOf(RecursoNoEncontradoException.class)
                 .hasMessage("Ítem no encontrado");
+    }
+
+    @Test
+    void actualizarCantidad_mayorAlStock_lanzaExcepcionYNoGuarda() {
+        Producto producto = Producto.builder().id(1L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
+        CarritoItem item = CarritoItem.builder().id(1L).producto(producto).cantidad(1).build();
+        when(carritoItemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+        assertThatThrownBy(() -> carritoItemService.actualizarCantidad(1L, 6))
+                .isInstanceOf(CantidadInvalidaException.class)
+                .hasMessageContaining("Stock insuficiente");
+        verify(carritoItemRepository, never()).save(any());
+    }
+
+    @Test
+    void actualizarCantidad_cero_lanzaExcepcionYNoGuarda() {
+        Producto producto = Producto.builder().id(1L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
+        CarritoItem item = CarritoItem.builder().id(1L).producto(producto).cantidad(1).build();
+        when(carritoItemRepository.findById(1L)).thenReturn(Optional.of(item));
+
+        assertThatThrownBy(() -> carritoItemService.actualizarCantidad(1L, 0))
+                .isInstanceOf(CantidadInvalidaException.class);
+        verify(carritoItemRepository, never()).save(any());
     }
 
     @Test

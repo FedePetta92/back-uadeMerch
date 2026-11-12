@@ -1,5 +1,6 @@
 package com.uade.e_commerce.service;
 
+import com.uade.e_commerce.exceptions.CantidadInvalidaException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Carrito;
 import com.uade.e_commerce.model.CarritoItem;
@@ -124,6 +125,44 @@ public class CarritoServiceTest {
                 .hasMessage("Producto no encontrado");
 
         verify(carritoRepository, never()).save(any());
+    }
+
+    @Test
+    void agregarProducto_productoYaEnElCarrito_sumaLaCantidadEnElMismoItem() {
+        Producto producto = Producto.builder().id(10L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
+        CarritoItem existente = CarritoItem.builder().id(7L).producto(producto).cantidad(2).build();
+        Carrito carrito = Carrito.builder().id(1L).items(new ArrayList<>(List.of(existente))).build();
+
+        when(carritoRepository.findByUsuarioId(1L)).thenReturn(Optional.of(carrito));
+        when(productoRepository.findByIdAndActivoTrue(10L)).thenReturn(Optional.of(producto));
+        when(carritoRepository.save(any(Carrito.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Carrito resultado = carritoService.agregarProducto(1L, 10L, 3);
+
+        assertThat(resultado.getItems()).hasSize(1);
+        assertThat(resultado.getItems().get(0).getCantidad()).isEqualTo(5);
+    }
+
+    @Test
+    void agregarProducto_superaElStockSumandoLoQueYaHabia_lanzaExcepcion() {
+        Producto producto = Producto.builder().id(10L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
+        CarritoItem existente = CarritoItem.builder().id(7L).producto(producto).cantidad(4).build();
+        Carrito carrito = Carrito.builder().id(1L).items(new ArrayList<>(List.of(existente))).build();
+
+        when(carritoRepository.findByUsuarioId(1L)).thenReturn(Optional.of(carrito));
+        when(productoRepository.findByIdAndActivoTrue(10L)).thenReturn(Optional.of(producto));
+
+        assertThatThrownBy(() -> carritoService.agregarProducto(1L, 10L, 2))
+                .isInstanceOf(CantidadInvalidaException.class)
+                .hasMessageContaining("Stock insuficiente");
+        verify(carritoRepository, never()).save(any());
+    }
+
+    @Test
+    void agregarProducto_cantidadCero_lanzaExcepcionSinTocarLaBase() {
+        assertThatThrownBy(() -> carritoService.agregarProducto(1L, 10L, 0))
+                .isInstanceOf(CantidadInvalidaException.class);
+        verifyNoInteractions(carritoRepository, productoRepository);
     }
 
     @Test

@@ -236,6 +236,65 @@ class AutorizacionPorUsuarioTest {
         llamar(get("/api/ordenes-compra/usuario/" + beto.id()), ana).esperarAccesoDenegado();
     }
 
+    @Test
+    void compra_detalleDeOrdenPropia_funciona_yAjena_devuelve403() throws Exception {
+        llamar(json(post("/api/carritos/" + beto.id() + "/items"), itemJson(1)), beto).esperar(200);
+        Respuesta orden = llamar(
+                json(post("/api/ordenes-compra/" + beto.id() + "/checkout"), "{\"numeroTarjeta\":\"4111111111111111\"}"),
+                beto);
+        orden.esperar(201);
+        String ordenId = extraer(orden.cuerpo(), "\"id\"\\s*:\\s*(\\d+)");
+
+        llamar(get("/api/ordenes-compra/" + ordenId), beto).esperar(200);
+        llamar(get("/api/ordenes-compra/" + ordenId), ana).esperarAccesoDenegado();
+    }
+
+    // ------------------------------------------------------------ CARRITO-ITEMS
+
+    @Test
+    void carritoItem_modificarOBorrarItemAjeno_devuelve403_yElItemQuedaIgual() throws Exception {
+        llamar(json(post("/api/carritos/" + beto.id() + "/items"), itemJson(1)), beto).esperar(200);
+        Long itemDeBeto = idDelPrimerItem(beto.id());
+
+        llamar(json(post("/api/carrito-items/" + itemDeBeto), "{\"cantidad\":5}"), ana).esperarAccesoDenegado();
+        llamar(delete("/api/carrito-items/" + itemDeBeto), ana).esperarAccesoDenegado();
+        llamar(get("/api/carrito-items/" + itemDeBeto), ana).esperarAccesoDenegado();
+
+        sincronizarConBase();
+        assertThat(carritoRepository.findByUsuarioId(beto.id()).orElseThrow().getItems().get(0).getCantidad())
+                .isEqualTo(1);
+    }
+
+    @Test
+    void carritoItem_listarTodosLosItems_esSoloParaAdmin() throws Exception {
+        assertThat(llamar(get("/api/carrito-items"), ana).status()).isEqualTo(403);
+    }
+
+    @Test
+    void carrito_agregarDosVecesElMismoProducto_sumaEnUnSoloItem() throws Exception {
+        llamar(json(post("/api/carritos/" + ana.id() + "/items"), itemJson(2)), ana).esperar(200);
+        llamar(json(post("/api/carritos/" + ana.id() + "/items"), itemJson(3)), ana).esperar(200);
+
+        sincronizarConBase();
+        var items = carritoRepository.findByUsuarioId(ana.id()).orElseThrow().getItems();
+        assertThat(items).hasSize(1);
+        assertThat(items.get(0).getCantidad()).isEqualTo(5);
+    }
+
+    @Test
+    void carrito_agregarMasQueElStock_devuelve400() throws Exception {
+        Respuesta respuesta = llamar(json(post("/api/carritos/" + ana.id() + "/items"), itemJson(11)), ana);
+        respuesta.esperar(400);
+        assertThat(respuesta.cuerpo()).contains("Stock insuficiente");
+    }
+
+    @Test
+    void carrito_usuarioSinCarrito_veUnCarritoVacio() throws Exception {
+        Respuesta carrito = llamar(get("/api/carritos/" + ana.id()), ana);
+        carrito.esperar(200);
+        assertThat(carrito.cuerpo()).contains("\"items\":[]");
+    }
+
     // --------------------------------------------------------------- SIN TOKEN
 
     @Test

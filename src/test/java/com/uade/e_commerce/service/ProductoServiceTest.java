@@ -76,6 +76,23 @@ public class ProductoServiceTest {
     }
 
     @Test
+    void buscarProductos_conTexto_usaLaBusquedaPorNombreSinEspacios() {
+        Producto mate = Producto.builder().id(1L).nombre("Mate UADE").precio(BigDecimal.TEN).stock(5).build();
+        when(productoRepository.findByActivoTrueAndNombreContainingIgnoreCase("mate")).thenReturn(List.of(mate));
+
+        assertThat(productoService.buscarProductos("  mate ")).containsExactly(mate);
+    }
+
+    @Test
+    void buscarProductos_sinTexto_devuelveElCatalogoCompleto() {
+        when(productoRepository.findByActivoTrue()).thenReturn(List.of());
+
+        assertThat(productoService.buscarProductos("   ")).isEmpty();
+        assertThat(productoService.buscarProductos(null)).isEmpty();
+        verify(productoRepository, never()).findByActivoTrueAndNombreContainingIgnoreCase(any());
+    }
+
+    @Test
     void deleteProducto_existente_loQuitaDeLosCarritosYLoDaDeBaja() {
         Producto producto = Producto.builder().id(1L).nombre("Remera").precio(BigDecimal.TEN).stock(5).build();
 
