@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.e_commerce.dto.CarritoItemResponseDTO;
+import com.uade.e_commerce.exceptions.CantidadInvalidaException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.CarritoItem;
 import com.uade.e_commerce.repository.CarritoItemRepository;
@@ -27,8 +28,17 @@ public class CarritoItemService {
                 .orElseThrow(() -> new RecursoNoEncontradoException("Ítem no encontrado"));
     }
 
+    // Cambia la cantidad de un item. Lanza CantidadInvalidaException (400) si es menor a 1 o supera el stock.
+    // Para sacar un producto del carrito se usa el DELETE, no cantidad 0.
     public CarritoItem actualizarCantidad(Long itemId, Integer nuevaCantidad) {
         CarritoItem item = obtenerPorId(itemId);
+        if (nuevaCantidad == null || nuevaCantidad < 1) {
+            throw new CantidadInvalidaException("La cantidad tiene que ser al menos 1");
+        }
+        if (nuevaCantidad > item.getProducto().getStock()) {
+            throw new CantidadInvalidaException("Stock insuficiente para " + item.getProducto().getNombre()
+                    + ": quedan " + item.getProducto().getStock() + " unidades");
+        }
         item.setCantidad(nuevaCantidad);
         return carritoItemRepository.save(item);
     }

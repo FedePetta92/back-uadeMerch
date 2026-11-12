@@ -41,7 +41,8 @@ public class CarritoController {
             @AuthenticationPrincipal Usuario usuarioLogueado,
             @PathVariable Long usuarioId) {
         AccesoUsuario.validarMismoUsuario(usuarioLogueado, usuarioId);
-        Carrito carrito = carritoService.obtenerCarritoPorUsuario(usuarioId);
+        // Si el usuario todavía no tiene carrito se crea vacío (antes devolvía 404)
+        Carrito carrito = carritoService.obtenerOcrearCarritoPorUsuario(usuarioId);
         return ResponseEntity.ok(convertirADTO(carrito));
     }
 

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.e_commerce.exceptions.CantidadInvalidaException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Carrito;
 import com.uade.e_commerce.model.CarritoItem;
@@ -29,8 +30,11 @@ public class CarritoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
-    /** Busca el carrito del usuario, si todavia no tiene uno lo crea vacio. */
-    private Carrito obtenerOcrearCarritoPorUsuario(Long usuarioId) {
+    /**
+     * Busca el carrito del usuario, si todavia no tiene uno lo crea vacio.
+     * Lo usa GET /api/carritos/{usuarioId}: un usuario recién registrado ve un carrito vacío en vez de un 404.
+     */
+    public Carrito obtenerOcrearCarritoPorUsuario(Long usuarioId) {
         return carritoRepository.findByUsuarioId(usuarioId)
                 .orElseGet(() -> crearCarritoParaUsuario(usuarioId));
     }
@@ -56,19 +60,39 @@ public class CarritoService {
     /**
      * Agrega un producto al carrito del usuario (si el usuario no tiene carrito, lo crea).
      * Solo se pueden agregar productos activos: si no existe o está dado de baja, lanza RecursoNoEncontradoException.
+     * Si el producto ya estaba en el carrito, suma la cantidad al item existente en vez de crear otro.
+     * Lanza CantidadInvalidaException (400) si la cantidad es menor a 1 o si el total supera el stock.
      */
     public Carrito agregarProducto(Long usuarioId, Long productoId, Integer cantidad) {
+        if (cantidad == null || cantidad < 1) {
+            throw new CantidadInvalidaException("La cantidad tiene que ser al menos 1");
+        }
+
         Carrito carrito = obtenerOcrearCarritoPorUsuario(usuarioId);
         // Un producto dado de baja ya no se puede agregar al carrito
         Producto producto = productoRepository.findByIdAndActivoTrue(productoId)
                 .orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
 
-        CarritoItem item = new CarritoItem();
-        item.setCarrito(carrito);
-        item.setProducto(producto);
-        item.setCantidad(cantidad);
+        CarritoItem existente = carrito.getItems().stream()
+                .filter(item -> item.getProducto().getId().equals(productoId))
+                .findFirst()
+                .orElse(null);
 
-        carrito.getItems().add(item);
+        int cantidadFinal = cantidad + (existente != null ? existente.getCantidad() : 0);
+        if (cantidadFinal > producto.getStock()) {
+            throw new CantidadInvalidaException("Stock insuficiente para " + producto.getNombre()
+                    + ": quedan " + producto.getStock() + " unidades");
+        }
+
+        if (existente != null) {
+            existente.setCantidad(cantidadFinal);
+        } else {
+            CarritoItem item = new CarritoItem();
+            item.setCarrito(carrito);
+            item.setProducto(producto);
+            item.setCantidad(cantidad);
+            carrito.getItems().add(item);
+        }
         return carritoRepository.save(carrito);
     }
 
