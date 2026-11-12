@@ -33,21 +33,59 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
+                        // Login público
                         .requestMatchers("/api/login/**")
                         .permitAll()
 
+                        // Registro público: solamente genera USER
                         .requestMatchers(HttpMethod.POST, "/api/usuarios")
                         .permitAll()
 
+                        // Consulta pública de productos
                         .requestMatchers(HttpMethod.GET, "/api/productos/**")
                         .permitAll()
 
+                        // Gestión de productos: solo ADMIN
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/productos",
+                                "/api/productos/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PUT,
+                                "/api/productos/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.PATCH,
+                                "/api/productos/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(
+                                HttpMethod.DELETE,
+                                "/api/productos/**"
+                        )
+                        .hasRole("ADMIN")
+
+                        // Administración de usuarios
+                        .requestMatchers(HttpMethod.GET, "/api/usuarios")
+                        .hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**")
+                        .authenticated()
+
+                        // Carritos: usuarios autenticados
                         .requestMatchers("/api/carritos/**")
                         .authenticated()
 
                         .requestMatchers("/api/carrito-items/**")
                         .authenticated()
 
+                        // Resto: requieren autenticación
                         .anyRequest()
                         .authenticated()
                 )

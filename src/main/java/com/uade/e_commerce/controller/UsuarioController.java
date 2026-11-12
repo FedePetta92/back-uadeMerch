@@ -1,18 +1,19 @@
 package com.uade.e_commerce.controller;
 
-import java.util.List;
-
+import com.uade.e_commerce.dto.RegisterUsuarioRequest;
+import com.uade.e_commerce.dto.UsuarioResponseDTO;
 import com.uade.e_commerce.dto.UsuarioUpdateDTO;
+import com.uade.e_commerce.model.Usuario;
+import com.uade.e_commerce.security.AccesoUsuario;
 import com.uade.e_commerce.service.ProductoService;
-//import lombok.Data;
+import com.uade.e_commerce.service.UsuarioService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.uade.e_commerce.dto.RegisterUsuarioRequest;
-import com.uade.e_commerce.dto.UsuarioResponseDTO;
-import com.uade.e_commerce.model.Usuario;
-import com.uade.e_commerce.security.AccesoUsuario;
-import com.uade.e_commerce.service.UsuarioService;
+import java.util.List;
+
+
+//import lombok.Data;
 
 @RestController
 @RequestMapping("/api/usuarios")

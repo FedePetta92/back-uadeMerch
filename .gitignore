@@ -31,7 +31,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-### Claude Code ###
-.claude/settings.local.json
-.claude/worktrees/
