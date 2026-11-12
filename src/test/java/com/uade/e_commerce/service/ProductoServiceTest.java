@@ -1,5 +1,9 @@
 package com.uade.e_commerce.service;
 
+import com.uade.e_commerce.dto.ProductoRequestDTO;
+import com.uade.e_commerce.dto.ProductoResponseDTO;
+import com.uade.e_commerce.dto.ProductoUpdateDTO;
+import com.uade.e_commerce.exceptions.PrecioNegativoException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.repository.CarritoItemRepository;
@@ -105,5 +109,92 @@ public class ProductoServiceTest {
         Producto producto = Producto.builder().nombre("Remera").build();
 
         assertThat(producto.isActivo()).isTrue();
+    }
+
+    @Test
+    void saveProducto_precioPositivo_guardaYDevuelveDTO() {
+        ProductoRequestDTO request = ProductoRequestDTO.builder()
+                .nombre("Remera")
+                .descripcion("desc")
+                .precio(BigDecimal.TEN)
+                .stock(5)
+                .build();
+
+        Producto productoGuardado = Producto.builder()
+                .id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
+
+        when(productoRepository.save(any(Producto.class))).thenReturn(productoGuardado);
+
+        ProductoResponseDTO response = productoService.saveProducto(request);
+
+        assertThat(response.getId()).isEqualTo(1L);
+        assertThat(response.getNombre()).isEqualTo("Remera");
+        assertThat(response.getPrecio()).isEqualByComparingTo(BigDecimal.TEN);
+        verify(productoRepository).save(any(Producto.class));
+    }
+
+    @Test
+    void saveProducto_precioNegativo_lanzaExcepcion() {
+        ProductoRequestDTO request = ProductoRequestDTO.builder()
+                .nombre("Remera")
+                .precio(BigDecimal.valueOf(-1))
+                .stock(5)
+                .build();
+
+        assertThatThrownBy(() -> productoService.saveProducto(request))
+                .isInstanceOf(PrecioNegativoException.class)
+                .hasMessage("El precio no puede ser negativo");
+
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProducto_existente_actualizaDatosYDevuelveDTO() {
+        ProductoUpdateDTO dto = new ProductoUpdateDTO();
+        dto.setNombre("Buzo");
+        dto.setPrecio(BigDecimal.valueOf(500));
+        dto.setStock(3);
+
+        Producto productoExistente = Producto.builder()
+                .id(1L).nombre("Remera").descripcion("desc").precio(BigDecimal.TEN).stock(5).build();
+        Producto productoActualizado = Producto.builder()
+                .id(1L).nombre("Buzo").descripcion("desc").precio(BigDecimal.valueOf(500)).stock(3).build();
+
+        when(productoRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(productoExistente));
+        when(productoRepository.save(productoExistente)).thenReturn(productoActualizado);
+
+        ProductoResponseDTO response = productoService.updateProducto(1L, dto);
+
+        assertThat(response.getNombre()).isEqualTo("Buzo");
+        assertThat(response.getPrecio()).isEqualByComparingTo(BigDecimal.valueOf(500));
+        assertThat(response.getStock()).isEqualTo(3);
+    }
+
+    @Test
+    void updateProducto_noExistente_lanzaExcepcion() {
+        ProductoUpdateDTO dto = new ProductoUpdateDTO();
+        dto.setNombre("Buzo");
+        dto.setPrecio(BigDecimal.TEN);
+        dto.setStock(5);
+
+        when(productoRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productoService.updateProducto(99L, dto))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("Producto no encontrado");
+
+        verify(productoRepository, never()).save(any());
+    }
+
+    @Test
+    void updateProducto_precioNegativo_lanzaExcepcion() {
+        ProductoUpdateDTO dto = new ProductoUpdateDTO();
+        dto.setNombre("Buzo");
+        dto.setPrecio(BigDecimal.valueOf(-10));
+        dto.setStock(5);
+
+        assertThatThrownBy(() -> productoService.updateProducto(1L, dto))
+                .isInstanceOf(PrecioNegativoException.class)
+                .hasMessage("El precio no puede ser negativo");
     }
 }

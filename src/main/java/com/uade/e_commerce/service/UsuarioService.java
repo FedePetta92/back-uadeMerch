@@ -39,14 +39,17 @@ public class UsuarioService {
         this.carritoRepository = carritoRepository;
     }
 
-    // Devuelve todos los usuarios activos (los dados de baja no se listan).
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findByActivoTrue();
+    // Devuelve todos los usuarios activos (los dados de baja no se listan), sin la contraseña.
+    public List<UsuarioResponseDTO> getAllUsuarios() {
+        return usuarioRepository.findByActivoTrue().stream()
+                .map(this::toResponseDTO)
+                .toList();
     }
 
-    // Busca un usuario activo por id. Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
-    public Usuario getUsuarioById(Long id) {
-        return usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
+    // Busca un usuario activo por id y lo devuelve sin la contraseña.
+    // Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
+    public UsuarioResponseDTO getUsuarioById(Long id) {
+        return toResponseDTO(buscarUsuario(id));
     }
 
     // Registra un usuario nuevo: valida que el email no esté usado, encripta la contraseña y lo guarda activo.
@@ -131,7 +134,7 @@ public class UsuarioService {
     }
 
     public void cambiarPassword(Long id, String nuevaPassword) {
-        Usuario usuario = getUsuarioById(id);
+        Usuario usuario = buscarUsuario(id);
         String passwordEncriptada = passwordEncoder.encode(nuevaPassword);
         usuario.setPassword(passwordEncriptada);
         usuarioRepository.save(usuario);
@@ -166,5 +169,23 @@ public class UsuarioService {
                 .token(token)
                 .usuarioId(usuario.getId())
                 .build();
+    }
+
+    // Uso interno: devuelve la entidad completa (incluye el hash de la contraseña) de un usuario activo.
+    // Nunca debe salir tal cual por la API.
+    private Usuario buscarUsuario(Long id) {
+        return usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Id no encontrado"));
+    }
+
+    // Convierte la entidad en el DTO público: sin password.
+    private UsuarioResponseDTO toResponseDTO(Usuario usuario) {
+        UsuarioResponseDTO dto = new UsuarioResponseDTO();
+        dto.setId(usuario.getId());
+        dto.setNombre(usuario.getNombre());
+        dto.setApellido(usuario.getApellido());
+        dto.setEmail(usuario.getEmail());
+        dto.setFechaNacimiento(usuario.getFechaNacimiento());
+        dto.setSexo(usuario.getSexo());
+        return dto;
     }
 }

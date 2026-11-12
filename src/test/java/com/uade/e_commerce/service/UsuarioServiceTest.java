@@ -24,6 +24,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,7 +116,7 @@ public class UsuarioServiceTest {
     }
 
     @Test
-    void login_credencialesValidas_devuelveToken() {
+    void login_credencialesValidas_devuelveTokenYUsuarioId() {
         LoginRequest request = LoginRequest.builder()
                 .email("mauro@test.com")
                 .password("1234")
@@ -272,6 +273,78 @@ public class UsuarioServiceTest {
                 .isInstanceOf(RecursoNoEncontradoException.class)
                 .hasMessage("Usuario no encontrado");
 
+        verify(usuarioRepository, never()).save(any());
+    }
+
+    @Test
+    void getAllUsuarios_conUsuarios_devuelveDTOsSinPassword() {
+        Usuario usuario1 = Usuario.builder().id(1L).nombre("Ana").apellido("Gomez").email("ana@test.com").build();
+        Usuario usuario2 = Usuario.builder().id(2L).nombre("Beto").apellido("Lopez").email("beto@test.com").build();
+
+        when(usuarioRepository.findByActivoTrue()).thenReturn(List.of(usuario1, usuario2));
+
+        List<UsuarioResponseDTO> resultado = usuarioService.getAllUsuarios();
+
+        assertThat(resultado).hasSize(2);
+        assertThat(resultado.get(0).getNombre()).isEqualTo("Ana");
+        assertThat(resultado.get(1).getNombre()).isEqualTo("Beto");
+        // UsuarioResponseDTO no tiene campo password: nunca se expone el hash
+    }
+
+    @Test
+    void getAllUsuarios_sinUsuarios_devuelveListaVacia() {
+        when(usuarioRepository.findByActivoTrue()).thenReturn(List.of());
+
+        assertThat(usuarioService.getAllUsuarios()).isEmpty();
+    }
+
+    @Test
+    void getUsuarioById_existente_devuelveDTO() {
+        Usuario usuario = Usuario.builder()
+                .id(1L).nombre("Mauro").apellido("Aguilera").email("mauro@test.com").build();
+
+        when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuario));
+
+        UsuarioResponseDTO resultado = usuarioService.getUsuarioById(1L);
+
+        assertThat(resultado.getId()).isEqualTo(1L);
+        assertThat(resultado.getNombre()).isEqualTo("Mauro");
+        assertThat(resultado.getEmail()).isEqualTo("mauro@test.com");
+    }
+
+    @Test
+    void getUsuarioById_noExistente_lanzaExcepcion() {
+        when(usuarioRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usuarioService.getUsuarioById(99L))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("Id no encontrado");
+    }
+
+    @Test
+    void cambiarPassword_existente_guardaNuevoHash() {
+        Usuario usuario = Usuario.builder()
+                .id(1L).email("mauro@test.com").password("hash-viejo").build();
+
+        when(usuarioRepository.findByIdAndActivoTrue(1L)).thenReturn(Optional.of(usuario));
+        when(passwordEncoder.encode("nueva-clave")).thenReturn("hash-nuevo");
+        when(usuarioRepository.save(usuario)).thenReturn(usuario);
+
+        usuarioService.cambiarPassword(1L, "nueva-clave");
+
+        assertThat(usuario.getPassword()).isEqualTo("hash-nuevo");
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void cambiarPassword_noExistente_lanzaExcepcion() {
+        when(usuarioRepository.findByIdAndActivoTrue(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> usuarioService.cambiarPassword(99L, "nueva-clave"))
+                .isInstanceOf(RecursoNoEncontradoException.class)
+                .hasMessage("Id no encontrado");
+
+        verify(passwordEncoder, never()).encode(any());
         verify(usuarioRepository, never()).save(any());
     }
 }

@@ -25,6 +25,7 @@ public class Categoria {
 
     
     @ManyToMany(mappedBy = "categorias")
+    @Builder.Default
     private List<Producto> productos = new ArrayList<>();
     
 }

@@ -76,7 +76,7 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
                         .requestMatchers(HttpMethod.DELETE, "/api/usuarios/**")
-                        .hasRole("ADMIN")
+                        .authenticated()
 
                         // Carritos: usuarios autenticados
                         .requestMatchers("/api/carritos/**")

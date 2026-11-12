@@ -57,6 +57,7 @@ public class Producto {
         joinColumns = @JoinColumn(name = "producto_id"),
         inverseJoinColumns = @JoinColumn(name = "categoria_id")
     )
+    @Builder.Default
     private List<Categoria> categorias = new ArrayList<>();
 
     // Borrado lógico: en vez de eliminar la fila se marca como dado de baja,
