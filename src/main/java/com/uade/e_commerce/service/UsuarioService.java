@@ -84,21 +84,8 @@ public class UsuarioService {
                 .rol(rol)
                 .build();
 
-        // Guardar usuario en la base de datos
-        Usuario saved = usuarioRepository.save(usuario);
-
-        // Construir respuesta sin exponer la contraseña
-        UsuarioResponseDTO response = new UsuarioResponseDTO();
-
-        response.setId(saved.getId());
-        response.setNombre(saved.getNombre());
-        response.setApellido(saved.getApellido());
-        response.setEmail(saved.getEmail());
-        response.setFechaNacimiento(saved.getFechaNacimiento());
-        response.setSexo(saved.getSexo());
-        response.setRol(saved.getRol());
-
-        return response;
+        // Guardar usuario en la base de datos y responder sin exponer la contraseña
+        return toResponseDTO(usuarioRepository.save(usuario));
     }
 
 
@@ -109,13 +96,7 @@ public class UsuarioService {
         Usuario user = usuarioRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Usuario no encontrado"));
         user.setNombre(dto.getNombre());
         user.setApellido(dto.getApellido());
-        Usuario updated = usuarioRepository.save(user);
-        UsuarioResponseDTO response = new UsuarioResponseDTO();
-        response.setId(updated.getId());
-        response.setNombre(updated.getNombre());
-        response.setApellido(updated.getApellido());
-        response.setEmail(updated.getEmail());
-        return response;
+        return toResponseDTO(usuarioRepository.save(user));
     }
 
     // Da de baja a un usuario con borrado lógico: lo marca como inactivo y guarda la fecha de baja.
@@ -168,6 +149,7 @@ public class UsuarioService {
         return LoginResponseDTO.builder()
                 .token(token)
                 .usuarioId(usuario.getId())
+                .rol(usuario.getRol())
                 .build();
     }
 
@@ -178,6 +160,7 @@ public class UsuarioService {
     }
 
     // Convierte la entidad en el DTO público: sin password.
+    // Lo usan todos los métodos que devuelven un usuario, así las respuestas tienen siempre los mismos campos.
     private UsuarioResponseDTO toResponseDTO(Usuario usuario) {
         UsuarioResponseDTO dto = new UsuarioResponseDTO();
         dto.setId(usuario.getId());
@@ -186,6 +169,7 @@ public class UsuarioService {
         dto.setEmail(usuario.getEmail());
         dto.setFechaNacimiento(usuario.getFechaNacimiento());
         dto.setSexo(usuario.getSexo());
+        dto.setRol(usuario.getRol());
         return dto;
     }
 }

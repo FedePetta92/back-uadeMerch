@@ -23,6 +23,9 @@ public class JwtService {
                 .claim("nombre", usuario.getNombre())
                 .claim("apellido", usuario.getApellido())
                 .claim("email", usuario.getEmail())
+                // El rol va en el token para que el front lo pueda leer al recargar la página.
+                // El filtro JWT no lo usa: toma el rol de la base, así un cambio de rol se aplica enseguida.
+                .claim("rol", usuario.getRol().name())
                 .issuedAt(new Date())
                 .expiration(
                         new Date(System.currentTimeMillis() + 1000 * 60 * 60)
