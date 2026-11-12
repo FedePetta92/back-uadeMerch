@@ -42,7 +42,8 @@ public class Usuario {
     @ColumnDefault("'USER'")
     private RolUsuario rol = RolUsuario.USER;
 
-    @Column(name = "fecha_nacimiento")
+    // NOT NULL, igual que en las bases ya creadas (el registro la exige)
+    @Column(name = "fecha_nacimiento", nullable = false)
     private LocalDate fechaNacimiento;
 
     @Column(nullable = false)

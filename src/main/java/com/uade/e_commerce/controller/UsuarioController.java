@@ -7,6 +7,7 @@ import com.uade.e_commerce.model.Usuario;
 import com.uade.e_commerce.security.AccesoUsuario;
 import com.uade.e_commerce.service.ProductoService;
 import com.uade.e_commerce.service.UsuarioService;
+import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,8 +41,9 @@ public class UsuarioController {
         return usuarioService.getUsuarioById(id);
     }
 
+    // Registro público. @Valid aplica las validaciones de RegisterUsuarioRequest (400 si algún dato es inválido).
     @PostMapping
-    public UsuarioResponseDTO saveUsuario(@RequestBody RegisterUsuarioRequest request) {
+    public UsuarioResponseDTO saveUsuario(@Valid @RequestBody RegisterUsuarioRequest request) {
         return usuarioService.saveUsuario(request);
     }
 
