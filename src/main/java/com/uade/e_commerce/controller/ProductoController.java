@@ -15,6 +15,9 @@ import com.uade.e_commerce.service.ProductoService;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import jakarta.validation.Valid;
 
 import com.uade.e_commerce.dto.ProductoUpdateDTO;
 
@@ -37,10 +40,10 @@ public class ProductoController {
     }
 
     //get http://localhost:8080/api/productos -> listar todos productos
+    //get http://localhost:8080/api/productos?nombre=mate -> buscador: solo los que contienen "mate" en el nombre
     @GetMapping
-    public List<Producto> getAllProductos() {
-        // Lógica para obtener todos los productos
-        return productoService.getAllProductos();
+    public List<Producto> getAllProductos(@RequestParam(required = false) String nombre) {
+        return productoService.buscarProductos(nombre);
     }
 
     //get http://localhost:8080/api/productos/1 
@@ -57,13 +60,15 @@ public class ProductoController {
 
     // crear un producto nuevo
     // post http://localhost:8080/api/productos (enviar body con datos del producto)
+    // Solo ADMIN (SecurityConfig). @Valid devuelve 400 si falta el nombre, el precio o el stock.
     @PostMapping()
-    public ProductoResponseDTO saveProducto(@RequestBody ProductoRequestDTO producto) {
+    public ProductoResponseDTO saveProducto(@Valid @RequestBody ProductoRequestDTO producto) {
         return productoService.saveProducto(producto);
     }
 
+    // Solo ADMIN (SecurityConfig).
     @PutMapping("/{id}")
-    public ProductoResponseDTO updateProducto(@PathVariable Long id, @RequestBody ProductoUpdateDTO dto) {
+    public ProductoResponseDTO updateProducto(@PathVariable Long id, @Valid @RequestBody ProductoUpdateDTO dto) {
         return productoService.updateProducto(id, dto);
     }
 

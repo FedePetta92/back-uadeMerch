@@ -36,6 +36,15 @@ public class ProductoService {
         return productoRepository.findByActivoTrue();
     }
 
+    // Buscador del catálogo: productos activos cuyo nombre contiene el texto, sin importar mayúsculas.
+    // Si el texto viene vacío, devuelve el catálogo completo.
+    public List<Producto> buscarProductos(String nombre) {
+        if (nombre == null || nombre.isBlank()) {
+            return getAllProductos();
+        }
+        return productoRepository.findByActivoTrueAndNombreContainingIgnoreCase(nombre.trim());
+    }
+
     // Busca un producto activo por id. Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).
     public Producto getProductoById(Long id) {
         return productoRepository.findByIdAndActivoTrue(id).orElseThrow(() -> new RecursoNoEncontradoException("Producto no encontrado"));
@@ -56,6 +65,7 @@ public class ProductoService {
     }
 
     // Actualiza nombre, precio y stock de un producto activo y devuelve sus datos.
+    // Descripción e imagen se cambian solo si vienen en el pedido (si llegan en null se conservan).
     // Lanza PrecioNegativoException si el precio es negativo, y RecursoNoEncontradoException (404)
     // si el producto no existe o está dado de baja.
     public ProductoResponseDTO updateProducto(Long id, ProductoUpdateDTO dto) {
@@ -69,6 +79,12 @@ public class ProductoService {
         prod.setNombre(dto.getNombre());
         prod.setPrecio(dto.getPrecio());
         prod.setStock(dto.getStock());
+        if (dto.getDescripcion() != null) {
+            prod.setDescripcion(dto.getDescripcion());
+        }
+        if (dto.getImagen() != null) {
+            prod.setImagen(dto.getImagen());
+        }
         Producto updated = productoRepository.save(prod);
         ProductoResponseDTO response = new ProductoResponseDTO();
         response.setId(updated.getId());
@@ -76,6 +92,7 @@ public class ProductoService {
         response.setDescripcion(updated.getDescripcion());
         response.setPrecio(updated.getPrecio());
         response.setStock(updated.getStock());
+        response.setImagen(updated.getImagen());
         return response;
     }
 

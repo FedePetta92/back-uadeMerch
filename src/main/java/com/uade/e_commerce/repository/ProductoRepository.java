@@ -20,4 +20,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
     // Solo productos activos (los dados de baja con borrado lógico quedan afuera del catálogo)
     List<Producto> findByActivoTrue();
     Optional<Producto> findByIdAndActivoTrue(Long id);
+
+    // Buscador: productos activos cuyo nombre contiene el texto (genera un LIKE '%texto%' sin distinguir mayúsculas)
+    List<Producto> findByActivoTrueAndNombreContainingIgnoreCase(String nombre);
 }
