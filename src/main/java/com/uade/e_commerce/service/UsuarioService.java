@@ -3,6 +3,7 @@ package com.uade.e_commerce.service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.uade.e_commerce.model.RolUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,12 +53,24 @@ public class UsuarioService {
     // Devuelve sus datos sin la contraseña.
     // El email se busca también entre los dados de baja, porque en la tabla tiene que ser único.
     public UsuarioResponseDTO saveUsuario(RegisterUsuarioRequest request) {
+
+        // Verificar que el email no esté registrado
         if (usuarioRepository.findByEmail(request.getEmail()).isPresent()) {
-            throw new EmailDuplicadoException("Ya existe un usuario registrado con ese email");
+            throw new EmailDuplicadoException(
+                    "Ya existe un usuario registrado con ese email"
+            );
         }
 
+        // Encriptar contraseña
         String passwordEncriptada =
                 passwordEncoder.encode(request.getPassword());
+
+        // Determinar el rol del usuario
+        RolUsuario rol = request.getRol() != null
+                ? request.getRol()
+                : RolUsuario.USER;
+
+        // Crear usuario
         Usuario usuario = Usuario.builder()
                 .nombre(request.getNombre())
                 .apellido(request.getApellido())
@@ -65,17 +78,27 @@ public class UsuarioService {
                 .password(passwordEncriptada)
                 .fechaNacimiento(request.getFechaNacimiento())
                 .sexo(request.getSexo())
+                .rol(rol)
                 .build();
+
+        // Guardar usuario en la base de datos
         Usuario saved = usuarioRepository.save(usuario);
+
+        // Construir respuesta sin exponer la contraseña
         UsuarioResponseDTO response = new UsuarioResponseDTO();
+
         response.setId(saved.getId());
         response.setNombre(saved.getNombre());
         response.setApellido(saved.getApellido());
         response.setEmail(saved.getEmail());
         response.setFechaNacimiento(saved.getFechaNacimiento());
         response.setSexo(saved.getSexo());
+        response.setRol(saved.getRol());
+
         return response;
     }
+
+
 
     // Actualiza el nombre y el apellido de un usuario activo y devuelve sus datos.
     // Si no existe o está dado de baja, lanza RecursoNoEncontradoException (404).

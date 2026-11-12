@@ -1,5 +1,6 @@
 package com.uade.e_commerce.dto;
 
+import com.uade.e_commerce.model.RolUsuario;
 import com.uade.e_commerce.model.UsuarioSexo;
 import lombok.Data;
 
@@ -13,4 +14,5 @@ public class UsuarioResponseDTO {
     private String email;
     private LocalDate fechaNacimiento;
     private UsuarioSexo sexo;
+    private RolUsuario rol;
 }

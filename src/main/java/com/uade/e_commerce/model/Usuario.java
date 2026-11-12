@@ -1,12 +1,7 @@
 package com.uade.e_commerce.model;
 
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +35,12 @@ public class Usuario {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    @ColumnDefault("'USER'")
+    private RolUsuario rol = RolUsuario.USER;
 
     @Column(name = "fecha_nacimiento")
     private LocalDate fechaNacimiento;

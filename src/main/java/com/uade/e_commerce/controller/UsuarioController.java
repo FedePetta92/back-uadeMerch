@@ -1,16 +1,16 @@
 package com.uade.e_commerce.controller;
 
-import java.util.List;
-
-import com.uade.e_commerce.dto.UsuarioUpdateDTO;
-import com.uade.e_commerce.service.ProductoService;
-//import lombok.Data;
-import org.springframework.web.bind.annotation.*;
-
 import com.uade.e_commerce.dto.RegisterUsuarioRequest;
 import com.uade.e_commerce.dto.UsuarioResponseDTO;
+import com.uade.e_commerce.dto.UsuarioUpdateDTO;
 import com.uade.e_commerce.model.Usuario;
+import com.uade.e_commerce.service.ProductoService;
 import com.uade.e_commerce.service.UsuarioService;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+//import lombok.Data;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,6 +38,7 @@ public class UsuarioController {
     public UsuarioResponseDTO saveUsuario(@RequestBody RegisterUsuarioRequest request) {
         return usuarioService.saveUsuario(request);
     }
+
 
     @PutMapping("/{id}")
     public UsuarioResponseDTO updateUsuario(@PathVariable Long id, @RequestBody UsuarioUpdateDTO dto) {

@@ -2,6 +2,7 @@ package com.uade.e_commerce.dto;
 
 import java.time.LocalDate;
 
+import com.uade.e_commerce.model.RolUsuario;
 import com.uade.e_commerce.model.UsuarioSexo;
 
 import lombok.AllArgsConstructor;
@@ -22,4 +23,5 @@ public class RegisterUsuarioRequest {
     private String password;
     private LocalDate fechaNacimiento;
     private UsuarioSexo sexo;
+    private RolUsuario rol;
 }
