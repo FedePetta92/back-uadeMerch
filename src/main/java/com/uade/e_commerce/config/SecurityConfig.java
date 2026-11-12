@@ -82,6 +82,11 @@ public class SecurityConfig {
                         .requestMatchers("/api/carritos/**")
                         .authenticated()
 
+                        // El listado de items de TODOS los carritos es información de administración
+                        .requestMatchers(HttpMethod.GET, "/api/carrito-items")
+                        .hasRole("ADMIN")
+
+                        // Un item puntual: el controller además verifica que sea del usuario logueado
                         .requestMatchers("/api/carrito-items/**")
                         .authenticated()
 

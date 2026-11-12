@@ -57,9 +57,13 @@ public class OrdenCompraController {
         return ResponseEntity.ok(ordenService.listarPorUsuario(usuarioId));
     }
 
-    // Detalle de una orden.
+    // Detalle de una orden. Solo la puede ver el usuario que la hizo (403 si es de otro).
     @GetMapping("/{ordenId}")
-    public ResponseEntity<OrdenCompraResponseDTO> obtenerOrden(@PathVariable Long ordenId) {
-        return ResponseEntity.ok(ordenService.obtenerPorId(ordenId));
+    public ResponseEntity<OrdenCompraResponseDTO> obtenerOrden(
+            @AuthenticationPrincipal Usuario usuarioLogueado,
+            @PathVariable Long ordenId) {
+        OrdenCompraResponseDTO orden = ordenService.obtenerPorId(ordenId);
+        AccesoUsuario.validarMismoUsuario(usuarioLogueado, orden.getUsuarioId());
+        return ResponseEntity.ok(orden);
     }
 }
