@@ -23,4 +23,7 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
 
     // Buscador: productos activos cuyo nombre contiene el texto (genera un LIKE '%texto%' sin distinguir mayúsculas)
     List<Producto> findByActivoTrueAndNombreContainingIgnoreCase(String nombre);
+
+    List<Producto> findByActivoTrueAndDescripcionContainingIgnoreCase(String descripcion); //Busca el producto por la descripcion y retorna una lista de productos, si no lo encuentra lanza una excepcion de recurso no encontrado (404)
+
 }
