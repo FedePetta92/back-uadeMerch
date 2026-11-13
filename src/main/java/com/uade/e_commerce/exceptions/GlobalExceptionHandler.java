@@ -93,4 +93,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleAccesoDenegado(AccesoDenegadoException ex) {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
     }
+
+    @ExceptionHandler(ProductoNoDisponibleException.class)
+    public ResponseEntity<String> handleProductoNoDisponible(ProductoNoDisponibleException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }

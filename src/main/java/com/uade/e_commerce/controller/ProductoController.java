@@ -46,6 +46,11 @@ public class ProductoController {
         return productoService.buscarProductos(nombre);
     }
 
+    @GetMapping("/buscar")
+    public List<Producto> buscarPorDescripcion(@RequestParam String descripcion) {
+        return productoService.buscarPorDescripcion(descripcion);
+    }
+
     //get http://localhost:8080/api/productos/1 
     @GetMapping("/{id}")
     public Producto getProductoById(@PathVariable Long id) {

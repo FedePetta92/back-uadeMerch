@@ -11,6 +11,7 @@ import com.uade.e_commerce.dto.ProductoRequestDTO;
 import com.uade.e_commerce.dto.ProductoResponseDTO;
 import com.uade.e_commerce.dto.ProductoUpdateDTO;
 import com.uade.e_commerce.exceptions.PrecioNegativoException;
+import com.uade.e_commerce.exceptions.ProductoNoDisponibleException;
 import com.uade.e_commerce.exceptions.RecursoNoEncontradoException;
 import com.uade.e_commerce.model.Producto;
 import com.uade.e_commerce.repository.CarritoItemRepository;
@@ -124,5 +125,12 @@ public class ProductoService {
 
     }
 
+    public List<Producto> buscarPorDescripcion(String descripcion) {
+        List<Producto> productos = productoRepository.findByActivoTrueAndDescripcionContainingIgnoreCase(descripcion);
+        if (productos.isEmpty()) {
+            throw new ProductoNoDisponibleException("Producto no disponible");
+        }
+        return productos;
+    }
 
 }
